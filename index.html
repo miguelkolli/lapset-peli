@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma & Elsan Pukupeli</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #1a0a2e; min-height: 100vh; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+  h1 { color: #FFD93B; font-size: 28px; text-align: center; margin: 12px 0 4px; text-shadow: 0 0 20px #FF6FA4; letter-spacing: 1px; }
+  .sub { color: #C8A2F0; font-size: 14px; text-align: center; margin-bottom: 14px; }
+  .game { display: flex; flex-wrap: wrap; gap: 16px; justify-content: center; width: 100%; max-width: 900px; }
+  .doll-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .doll-wrap { background: linear-gradient(135deg,#2d1b4e,#1a0f3a); border-radius: 24px; padding: 8px; border: 2px solid #7C6BF0; box-shadow: 0 0 30px #7C6BF044; }
+  .controls { background: #120827; border-radius: 20px; padding: 14px; border: 1.5px solid #3a2060; width: 100%; max-width: 540px; display: flex; flex-direction: column; gap: 12px; max-height: 80vh; overflow-y: auto; }
+  .controls::-webkit-scrollbar { width: 6px; } .controls::-webkit-scrollbar-thumb { background: #7C6BF0; border-radius: 3px; }
+  .row-label { font-size: 12px; font-weight: 600; color: #C8A2F0; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+  .btn { padding: 7px 13px; border-radius: 10px; border: 1.5px solid #3a2060; background: #1e0f3a; font-size: 13px; cursor: pointer; color: #ddd; transition: all 0.15s; }
+  .btn:hover { background: #2d1b4e; border-color: #7C6BF0; color: #fff; }
+  .btn.on { background: #7C6BF0; border-color: #9B8BFF; color: #fff; box-shadow: 0 0 10px #7C6BF066; }
+  .swatch { width: 34px; height: 34px; border-radius: 50%; border: 2px solid #3a2060; cursor: pointer; transition: all 0.15s; }
+  .swatch:hover { transform: scale(1.15); border-color: #fff; }
+  .swatch.on { border: 3px solid #FFD93B; box-shadow: 0 0 10px #FFD93B88; transform: scale(1.1); }
+  .surprise { width: 100%; padding: 12px; border: none; border-radius: 14px; background: linear-gradient(90deg,#FF6FA4,#7C6BF0); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: opacity 0.15s; margin-top: 4px; }
+  .surprise:hover { opacity: 0.88; }
+  .save-btn { width: 100%; padding: 11px; border: 2px solid #FFD93B; border-radius: 14px; background: transparent; color: #FFD93B; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .save-btn:hover { background: #FFD93B22; }
+  @media (max-width: 600px) { .game { flex-direction: column; align-items: center; } }
+</style>
+</head>
+<body>
+
+<h1>✨ Alma & Elsan Pukupeli ✨</h1>
+<p class="sub">Pue hahmo juuri sellaiseksi kuin haluat!</p>
+
+<div class="game">
+  <div class="doll-area">
+    <div class="doll-wrap">
+      <svg id="doll" viewBox="0 0 400 480" width="260" style="--skin:#FFE0BD;--hair:#9B5A1E;--outfit:#FF6FA4;--bg:#2B1B4E;">
+        <defs>
+          <clipPath id="bgclip"><rect x="0" y="0" width="400" height="480" rx="24"/></clipPath>
+          <radialGradient id="spot" cx="50%" cy="44%" r="54%"><stop offset="0%" stop-color="#fff" stop-opacity="0.45"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient>
+        </defs>
+        <rect id="bg" x="0" y="0" width="400" height="480" rx="24" fill="var(--bg)"/>
+        <g clip-path="url(#bgclip)">
+          <g id="pat_star" style="display:none"><circle cx="60" cy="60" r="5" fill="#fff"/><circle cx="330" cy="90" r="6" fill="#fff"/><circle cx="120" cy="40" r="4" fill="#FFE98A"/><circle cx="300" cy="40" r="4" fill="#fff"/><circle cx="40" cy="160" r="4" fill="#fff"/><circle cx="360" cy="200" r="5" fill="#FFE98A"/><circle cx="50" cy="300" r="4" fill="#fff"/><circle cx="350" cy="330" r="5" fill="#fff"/><circle cx="200" cy="36" r="4" fill="#FFE98A"/><circle cx="88" cy="380" r="3" fill="#fff"/><circle cx="310" cy="410" r="4" fill="#FFE98A"/></g>
+          <g id="pat_rainbow" style="display:none"><rect x="0" y="0" width="400" height="80" fill="#FF8FA3" opacity="0.5"/><rect x="0" y="80" width="400" height="80" fill="#FFD36B" opacity="0.5"/><rect x="0" y="160" width="400" height="80" fill="#9BE39B" opacity="0.5"/><rect x="0" y="240" width="400" height="80" fill="#8FD0FF" opacity="0.5"/><rect x="0" y="320" width="400" height="80" fill="#C6A8FF" opacity="0.5"/><rect x="0" y="400" width="400" height="80" fill="#FFB38F" opacity="0.5"/></g>
+          <ellipse cx="200" cy="240" rx="145" ry="195" fill="url(#spot)"/>
+        </g>
+
+        <!-- Wings extra behind body -->
+        <g id="x_wings" class="ex" style="display:none"><path d="M150 255 Q70 210 50 295 Q90 305 150 282 Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="3"/><path d="M150 288 Q80 305 70 365 Q110 355 152 316 Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="3"/><path d="M250 255 Q330 210 350 295 Q310 305 250 282 Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="3"/><path d="M250 288 Q320 305 330 365 Q290 355 248 316 Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="3"/></g>
+
+        <!-- Legs -->
+        <rect x="170" y="358" width="22" height="86" rx="11" fill="var(--skin)"/>
+        <rect x="208" y="358" width="22" height="86" rx="11" fill="var(--skin)"/>
+        <ellipse cx="181" cy="448" rx="22" ry="13" fill="#5A4A66"/>
+        <ellipse cx="219" cy="448" rx="22" ry="13" fill="#5A4A66"/>
+
+        <!-- Arms -->
+        <rect x="120" y="252" width="22" height="94" rx="11" fill="var(--skin)"/>
+        <rect x="258" y="252" width="22" height="94" rx="11" fill="var(--skin)"/>
+        <circle cx="131" cy="350" r="15" fill="var(--skin)"/>
+        <circle cx="269" cy="350" r="15" fill="var(--skin)"/>
+        <ellipse cx="131" cy="340" rx="7" ry="4" fill="#fff" opacity="0.18"/>
+
+        <!-- Outfits -->
+        <g id="outfit0"><path d="M150 230 Q200 215 250 230 L285 382 Q200 408 115 382 Z" fill="var(--outfit)"/><path d="M150 230 Q200 215 250 230 L258 262 Q200 248 142 262 Z" fill="#fff" opacity="0.15"/><path d="M250 230 L285 382 Q255 394 234 390 L210 237 Z" fill="#000" opacity="0.07"/><circle cx="200" cy="292" r="9" fill="#fff" opacity="0.7"/><circle cx="200" cy="332" r="9" fill="#fff" opacity="0.7"/></g>
+        <g id="outfit1" style="display:none"><rect x="150" y="228" width="100" height="80" rx="16" fill="var(--outfit)"/><rect x="150" y="228" width="100" height="20" rx="10" fill="#fff" opacity="0.14"/><rect x="226" y="248" width="24" height="60" fill="#000" opacity="0.07"/><rect x="158" y="305" width="38" height="80" rx="10" fill="#4A5568"/><rect x="204" y="305" width="38" height="80" rx="10" fill="#4A5568"/></g>
+        <g id="outfit2" style="display:none"><path d="M150 230 Q200 218 250 230 L262 302 L138 302 Z" fill="var(--outfit)"/><path d="M120 302 Q200 287 280 302 L300 362 Q200 347 100 362 Z" fill="#fff" opacity="0.82"/><path d="M120 352 Q200 337 280 352 L295 394 Q200 380 105 394 Z" fill="var(--outfit)"/></g>
+        <g id="outfit3" style="display:none"><path d="M150 230 Q200 215 250 230 L270 372 Q200 397 130 372 Z" fill="var(--outfit)"/><path d="M250 232 Q330 250 322 362 L296 352 Q302 272 250 260 Z" fill="var(--outfit)" opacity="0.82"/><path d="M195 246 L210 246 L222 270 L200 287 L178 270 Z" fill="#FFD93B"/></g>
+        <g id="outfit4" style="display:none"><path d="M150 230 Q200 215 250 230 L280 374 Q200 400 120 374 Z" fill="var(--outfit)"/><circle cx="165" cy="282" r="7" fill="#FFD93B"/><circle cx="200" cy="264" r="7" fill="#fff"/><circle cx="235" cy="282" r="7" fill="#FFD93B"/><circle cx="180" cy="322" r="7" fill="#fff"/><circle cx="220" cy="322" r="7" fill="#fff"/><path d="M118 368 Q140 352 162 368 Q184 352 206 368 Q228 352 250 368 Q272 352 282 368 L282 382 Q200 402 118 382 Z" fill="#fff" opacity="0.88"/></g>
+        <g id="outfit5" style="display:none"><path d="M150 230 Q200 215 250 230 L285 382 Q200 408 115 382 Z" fill="var(--outfit)"/><path d="M168 288 l5 11 12 1 -9 9 3 12 -11 -6 -11 6 3 -12 -9 -9 12 -1 z" fill="#FFE98A"/><path d="M225 314 l4 8 9 1 -7 7 2 9 -8 -5 -8 5 2 -9 -7 -7 9 -1 z" fill="#FFE98A"/><path d="M197 346 l4 8 9 1 -7 7 2 9 -8 -5 -8 5 2 -9 -7 -7 9 -1 z" fill="#fff"/></g>
+        <g id="outfit6" style="display:none"><rect x="150" y="252" width="100" height="130" rx="14" fill="var(--outfit)"/><rect x="158" y="220" width="16" height="50" rx="8" fill="var(--outfit)"/><rect x="226" y="220" width="16" height="50" rx="8" fill="var(--outfit)"/><rect x="178" y="292" width="44" height="34" rx="6" fill="#fff" opacity="0.52"/><circle cx="166" cy="264" r="4" fill="#FFD93B"/><circle cx="234" cy="264" r="4" fill="#FFD93B"/></g>
+        <g id="outfit7" style="display:none"><path d="M152 230 Q200 216 248 230 L256 260 Q200 248 144 260 Z" fill="var(--outfit)"/><path d="M150 230 Q200 215 250 230 L270 380 Q200 406 130 380 Z" fill="var(--outfit)" opacity="0.7"/><path d="M144 260 Q200 248 256 260 L270 380 Q200 400 130 380 Z" fill="var(--outfit)"/><path d="M168 270 L174 390" stroke="#fff" stroke-width="2" opacity="0.3"/><path d="M232 270 L226 390" stroke="#fff" stroke-width="2" opacity="0.3"/></g>
+
+        <!-- Neck -->
+        <rect x="185" y="198" width="30" height="38" rx="12" fill="var(--skin)"/>
+        <ellipse cx="200" cy="208" rx="14" ry="6" fill="#000" opacity="0.07"/>
+
+        <!-- Head -->
+        <circle cx="200" cy="152" r="72" fill="var(--skin)"/>
+        <path d="M200 80 a72 72 0 0 1 62 114 a72 72 0 0 0 -62 -114 z" fill="#000" opacity="0.055"/>
+        <ellipse cx="173" cy="122" rx="24" ry="18" fill="#fff" opacity="0.11"/>
+
+        <!-- Animal ears -->
+        <g id="type0" style="display:none"></g>
+        <g id="type1" style="display:none"><path d="M138 98 L150 42 L188 88 Z" fill="var(--skin)"/><path d="M262 98 L250 42 L212 88 Z" fill="var(--skin)"/><path d="M146 88 L154 58 L175 86 Z" fill="#FF9BB3"/><path d="M254 88 L246 58 L225 86 Z" fill="#FF9BB3"/><circle cx="200" cy="168" r="4" fill="#E07A9B"/><line x1="150" y1="170" x2="120" y2="164" stroke="#9b8a7a" stroke-width="2.5"/><line x1="150" y1="177" x2="122" y2="180" stroke="#9b8a7a" stroke-width="2.5"/><line x1="250" y1="170" x2="280" y2="164" stroke="#9b8a7a" stroke-width="2.5"/><line x1="250" y1="177" x2="278" y2="180" stroke="#9b8a7a" stroke-width="2.5"/></g>
+        <g id="type2" style="display:none"><ellipse cx="166" cy="56" rx="17" ry="46" fill="var(--skin)" transform="rotate(-10 166 56)"/><ellipse cx="234" cy="56" rx="17" ry="46" fill="var(--skin)" transform="rotate(10 234 56)"/><ellipse cx="166" cy="62" rx="9" ry="31" fill="#FF9BB3" transform="rotate(-10 166 62)"/><ellipse cx="234" cy="62" rx="9" ry="31" fill="#FF9BB3" transform="rotate(10 234 62)"/><circle cx="200" cy="168" r="5" fill="#E07A9B"/></g>
+        <g id="type3" style="display:none"><circle cx="150" cy="92" r="28" fill="var(--skin)"/><circle cx="250" cy="92" r="28" fill="var(--skin)"/><circle cx="150" cy="92" r="15" fill="#C68B6B"/><circle cx="250" cy="92" r="15" fill="#C68B6B"/><circle cx="200" cy="168" r="7" fill="#5A3A2A"/></g>
+        <g id="type4" style="display:none"><path d="M134 100 L142 36 L184 92 Z" fill="var(--skin)"/><path d="M266 100 L258 36 L216 92 Z" fill="var(--skin)"/><path d="M142 92 L148 54 L172 90 Z" fill="#fff"/><path d="M258 92 L252 54 L228 90 Z" fill="#fff"/><path d="M200 168 Q196 180 190 182 Q200 172 210 182 Q204 180 200 168Z" fill="#3A2A2A"/></g>
+        <g id="type5" style="display:none"><path d="M158 82 Q152 36 130 30 Q152 46 152 86 Z" fill="#F0E0BE"/><path d="M242 82 Q248 36 270 30 Q248 46 248 86 Z" fill="#F0E0BE"/><path d="M178 80 L188 50 L198 80 Z" fill="#9BE3B0"/><path d="M202 80 L212 50 L222 80 Z" fill="#9BE3B0"/><circle cx="200" cy="170" r="5" fill="#3A6B4A"/></g>
+        <g id="type6" style="display:none"><circle cx="200" cy="172" r="13" fill="#FF4D4D"/><circle cx="196" cy="167" r="4" fill="#fff" opacity="0.6"/><circle cx="152" cy="178" r="14" fill="#FF6F91" opacity="0.7"/><circle cx="248" cy="178" r="14" fill="#FF6F91" opacity="0.7"/></g>
+
+        <!-- Hair -->
+        <g id="hair0" class="hair"><path d="M128 152 Q120 62 200 64 Q280 62 272 152 Q278 232 250 274 L232 252 Q250 174 200 152 Q150 174 168 252 L150 274 Q122 232 128 152Z" fill="var(--hair)"/><path d="M132 94 Q200 62 268 94 Q210 112 200 118 Q190 112 132 94Z" fill="var(--hair)"/><path d="M152 98 Q188 76 222 82 Q192 94 170 112 Z" fill="#fff" opacity="0.17"/></g>
+        <g id="hair1" class="hair" style="display:none"><path d="M130 154 Q122 72 200 70 Q278 72 270 154 Q272 198 258 212 L250 170 Q240 122 200 122 Q160 122 150 170 L142 212 Q128 198 130 154Z" fill="var(--hair)"/><path d="M152 102 Q188 82 222 90 Q192 102 167 122 Z" fill="#fff" opacity="0.15"/></g>
+        <g id="hair2" class="hair" style="display:none"><path d="M134 132 Q140 74 200 74 Q260 74 266 132 Q230 106 200 110 Q170 106 134 132Z" fill="var(--hair)"/><circle cx="128" cy="172" r="31" fill="var(--hair)"/><circle cx="272" cy="172" r="31" fill="var(--hair)"/><circle cx="120" cy="212" r="23" fill="var(--hair)"/><circle cx="280" cy="212" r="23" fill="var(--hair)"/></g>
+        <g id="hair3" class="hair" style="display:none"><circle cx="200" cy="94" r="48" fill="var(--hair)"/><circle cx="150" cy="112" r="40" fill="var(--hair)"/><circle cx="250" cy="112" r="40" fill="var(--hair)"/><circle cx="132" cy="152" r="31" fill="var(--hair)"/><circle cx="268" cy="152" r="31" fill="var(--hair)"/></g>
+        <g id="hair4" style="display:none"></g>
+        <g id="hair5" class="hair" style="display:none"><path d="M134 132 Q140 76 200 76 Q260 76 266 132 Q230 106 200 110 Q170 106 134 132Z" fill="var(--hair)"/><circle cx="200" cy="72" r="27" fill="var(--hair)"/><circle cx="192" cy="66" r="10" fill="#fff" opacity="0.19"/></g>
+        <g id="hair6" class="hair" style="display:none"><path d="M126 152 Q116 66 200 66 Q284 66 274 152 Q286 242 250 298 Q264 252 246 202 Q258 252 238 292 L224 262 Q244 182 200 154 Q156 182 176 262 L162 292 Q142 252 154 202 Q136 252 150 298 Q114 242 126 152Z" fill="var(--hair)"/></g>
+        <g id="hair7" class="hair" style="display:none"><path d="M150 112 L168 58 L183 106 L200 52 L217 106 L232 58 L250 112 Q200 98 150 112Z" fill="var(--hair)"/><path d="M138 122 Q200 102 262 122 Q258 152 248 164 L240 132 Q200 118 160 132 L152 164 Q142 152 138 122Z" fill="var(--hair)"/></g>
+        <g id="hair8" class="hair" style="display:none"><path d="M128 154 Q122 66 200 66 Q278 66 272 154 L270 160 Q245 100 200 106 Q155 100 130 160 Z" fill="var(--hair)"/><path d="M130 160 Q155 100 200 106 Q245 100 270 160 L272 200 Q230 140 200 150 Q170 140 128 200Z" fill="var(--hair)" opacity="0.8"/></g>
+
+        <!-- Face features -->
+        <ellipse cx="200" cy="180" rx="3" ry="5" fill="#000" opacity="0.055"/>
+        <path d="M160 140 Q172 132 184 140" stroke="var(--hair)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <path d="M216 140 Q228 132 240 140" stroke="var(--hair)" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="172" cy="154" rx="12" ry="14" fill="#fff"/>
+        <ellipse cx="228" cy="154" rx="12" ry="14" fill="#fff"/>
+        <circle id="eyeL" cx="173" cy="155" r="8" fill="#6B4A2E"/>
+        <circle id="eyeR" cx="229" cy="155" r="8" fill="#6B4A2E"/>
+        <circle cx="173" cy="155" r="3.8" fill="#1a1210"/>
+        <circle cx="229" cy="155" r="3.8" fill="#1a1210"/>
+        <circle cx="170" cy="151" r="2.8" fill="#fff"/>
+        <circle cx="226" cy="151" r="2.8" fill="#fff"/>
+        <ellipse cx="157" cy="174" rx="11" ry="7" fill="#FF9BB3" opacity="0.52"/>
+        <ellipse cx="243" cy="174" rx="11" ry="7" fill="#FF9BB3" opacity="0.52"/>
+
+        <!-- Mouths -->
+        <g id="m0" class="mo"><path d="M184 182 Q200 196 216 182" stroke="#C0506B" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+        <g id="m1" class="mo" style="display:none"><path d="M182 180 Q200 206 218 180 Q200 190 182 180Z" fill="#9B3A52"/><path d="M190 194 Q200 200 210 194 Q200 198 190 194Z" fill="#FF7E9D"/></g>
+        <g id="m2" class="mo" style="display:none"><ellipse cx="200" cy="188" rx="9" ry="11" fill="#9B3A52"/></g>
+        <g id="m3" class="mo" style="display:none"><path d="M186 186 Q200 192 214 186" stroke="#C0506B" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+
+        <!-- Headwear -->
+        <g id="h_none" class="hw"></g>
+        <g id="h_crown" class="hw" style="display:none"><path d="M158 94 L172 118 L200 98 L228 118 L242 94 L246 124 Q200 134 154 124 Z" fill="#FFD93B" stroke="#E8B400" stroke-width="3"/><circle cx="200" cy="100" r="7" fill="#FF5E8A"/><circle cx="172" cy="114" r="4" fill="#5BA8F5"/><circle cx="228" cy="114" r="4" fill="#5BA8F5"/></g>
+        <g id="h_jester" class="hw" style="display:none"><path d="M160 97 Q200 57 240 97 Q244 81 200 71 Q156 81 160 97Z" fill="#6FCF97"/><path d="M160 97 L150 71 Q150 59 168 65 Z" fill="#FF5E8A"/><path d="M200 71 L200 45 Q188 41 196 61 Z" fill="#FFD93B"/><path d="M240 97 L250 71 Q250 59 232 65 Z" fill="#5BA8F5"/><circle cx="150" cy="71" r="7" fill="#FFD93B"/><circle cx="200" cy="45" r="7" fill="#FF5E8A"/><circle cx="250" cy="71" r="7" fill="#5BA8F5"/></g>
+        <g id="h_top" class="hw" style="display:none"><rect x="166" y="44" width="68" height="52" rx="7" fill="#2a2a3a"/><rect x="150" y="92" width="100" height="13" rx="6" fill="#2a2a3a"/><rect x="166" y="80" width="68" height="13" fill="#FF5E8A"/></g>
+        <g id="h_band" class="hw" style="display:none"><path d="M138 118 Q200 98 262 118" stroke="#7C6BF0" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M200 71 l7 17 18 1 -13 12 4 18 -16 -9 -16 9 4 -18 -13 -12 18 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="2"/></g>
+        <g id="h_flower" class="hw" style="display:none"><circle cx="148" cy="102" r="11" fill="#FF5E8A"/><circle cx="135" cy="93" r="10" fill="#FFD93B"/><circle cx="161" cy="93" r="10" fill="#FFD93B"/><circle cx="142" cy="87" r="10" fill="#FFD93B"/><circle cx="154" cy="87" r="10" fill="#FFD93B"/><circle cx="148" cy="102" r="7" fill="#FF8C42"/></g>
+        <g id="h_bow" class="hw" style="display:none"><path d="M196 90 Q170 75 168 97 Q170 117 196 103 Z" fill="#FF5E8A"/><path d="M204 90 Q230 75 232 97 Q230 117 204 103 Z" fill="#FF5E8A"/><circle cx="200" cy="97" r="9" fill="#E84393"/></g>
+        <g id="h_cap" class="hw" style="display:none"><path d="M134 130 Q140 76 200 76 Q260 76 266 130 Q230 104 200 108 Q170 104 134 130Z" fill="var(--outfit)"/><circle cx="200" cy="73" r="28" fill="var(--outfit)"/><circle cx="200" cy="73" r="10" fill="#FFD93B"/><path d="M130 134 Q200 120 270 134 Q270 148 200 152 Q130 148 130 134Z" fill="var(--outfit)" opacity="0.7"/></g>
+        <g id="h_witch" class="hw" style="display:none"><path d="M175 126 L200 18 L225 126 Z" fill="#2a2a3a"/><path d="M148 134 Q200 118 252 134 Q252 148 200 154 Q148 148 148 134Z" fill="#2a2a3a"/><path d="M186 88 Q200 60 210 80 Q204 70 200 54 Q196 70 190 80Z" fill="#7C6BF0" opacity="0.5"/></g>
+
+        <!-- Extras -->
+        <g id="x_wand" class="ex" style="display:none"><line x1="269" y1="352" x2="302" y2="280" stroke="#A9743C" stroke-width="7" stroke-linecap="round"/><path d="M302 257 l7 17 18 1 -14 12 5 18 -16 -10 -16 10 5 -18 -14 -12 18 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="2"/><circle cx="302" cy="276" r="5" fill="#fff" opacity="0.6"/></g>
+        <g id="x_neck" class="ex" style="display:none"><path d="M178 222 Q200 246 222 222" stroke="#FFD93B" stroke-width="5" fill="none"/><circle cx="200" cy="244" r="9" fill="#5BA8F5" stroke="#2E7BC4" stroke-width="2.5"/></g>
+        <g id="x_bag" class="ex" style="display:none"><line x1="131" y1="252" x2="100" y2="330" stroke="#8C5A3C" stroke-width="9" stroke-linecap="round"/><rect x="74" y="324" width="46" height="38" rx="10" fill="#A0693A"/><rect x="82" y="318" width="30" height="12" rx="6" fill="#8C5A3C"/></g>
+        <g id="x_scarf" class="ex" style="display:none"><path d="M168 216 Q200 236 232 216 L236 232 Q200 252 164 232 Z" fill="#FF5E8A"/><path d="M212 234 L228 284 L210 284 L200 238 Z" fill="#FF5E8A"/></g>
+        <g id="x_glasses" class="ex" style="display:none"><rect x="150" y="143" width="43" height="30" rx="14" fill="#bfe0ff" opacity="0.4" stroke="#3A3A3A" stroke-width="4.5"/><rect x="207" y="143" width="43" height="30" rx="14" fill="#bfe0ff" opacity="0.4" stroke="#3A3A3A" stroke-width="4.5"/><line x1="193" y1="153" x2="207" y2="153" stroke="#3A3A3A" stroke-width="4"/></g>
+        <g id="x_sword" class="ex" style="display:none"><rect x="258" y="260" width="8" height="100" rx="4" fill="#C0C0C0"/><rect x="244" y="310" width="36" height="8" rx="4" fill="#8B6914"/><circle cx="262" cy="260" r="7" fill="#FFD93B" stroke="#E8B400" stroke-width="2"/></g>
+        <g id="x_guitar" class="ex" style="display:none"><ellipse cx="115" cy="330" rx="24" ry="28" fill="#8B4513"/><ellipse cx="115" cy="330" rx="10" ry="12" fill="#000" opacity="0.4"/><rect x="111" y="250" width="8" height="90" rx="4" fill="#8B4513"/><rect x="100" y="248" width="30" height="14" rx="4" fill="#6B3410"/><line x1="109" y1="258" x2="109" y2="355" stroke="#fff" stroke-width="1.5" opacity="0.6"/><line x1="115" y1="258" x2="115" y2="355" stroke="#fff" stroke-width="1.5" opacity="0.6"/><line x1="121" y1="258" x2="121" y2="355" stroke="#fff" stroke-width="1.5" opacity="0.6"/></g>
+      </svg>
+    </div>
+    <button class="surprise" onclick="surprise()">🎲 Yllätä minut!</button>
+  </div>
+
+  <div class="controls" id="panel"></div>
+</div>
+
+<script>
+const SKIN=['#FFE9D6','#FFE0BD','#FFD1B0','#F7D7C4','#F1C27D','#E8B173','#E0AC69','#D9A066','#C68642','#A56635','#8D5524','#6B4226','#4A2F1B','#B8E994','#C8A2F0','#9BD3FF','#FF9FB2','#FF6B6B'];
+const HAIR=['#1a0e08','#3A2A1A','#9B5A1E','#F0C84B','#E2574C','#7C5CD6','#F07CC4','#F2F2F2','#5BC0EB','#56D45B','#FF8C42','#FF4FB3'];
+const OUTFIT=['#FF6FA4','#7C6BF0','#34C3A6','#FFC93C','#5BA8F5','#FF8C42','#E84393','#56D45B','#FF4D6D','#9B6BF0','#E84242','#34A8C3'];
+const BG=[{c:'#2B1B4E'},{c:'#0a2040'},{c:'#0d2d16'},{c:'#2d1a00'},{c:'#FFE3F1'},{c:'#E3F0FF'},{c:'#FFF6D6'},{c:'#1a1a2e',p:'star'},{c:'#ffffff',p:'rainbow'}];
+const TYPES=['Ihminen','Kissa','Pupu','Karhu','Kettu','Lohikäärme','Klovni'];
+const EXPR=['Iloinen','Nauru','Yllättynyt','Tyyni'];
+const HAIRSTYLES=['Pitkät','Polkka','Letit','Kiharat','Ei hiuksia','Nuttura','Aallot','Piikit','Kaksoistumput'];
+const OUTFITS=['Mekko','T-paita','Tutu','Viitta','Sirkusasu','Tähtimekko','Haalari','Bleiseri'];
+const HEAD=[{n:'Ei mitään',el:'h_none'},{n:'Kruunu',el:'h_crown'},{n:'Jesterihattu',el:'h_jester'},{n:'Silinteri',el:'h_top'},{n:'Tähtipanta',el:'h_band'},{n:'Kukka',el:'h_flower'},{n:'Rusetti',el:'h_bow'},{n:'Lippis',el:'h_cap'},{n:'Noitahattu',el:'h_witch'}];
+const EXTRA=[{n:'Ei mitään'},{n:'Siivet',el:'x_wings'},{n:'Taikasauva',el:'x_wand'},{n:'Kaulakoru',el:'x_neck'},{n:'Reppu',el:'x_bag'},{n:'Huivi',el:'x_scarf'},{n:'Lasit',el:'x_glasses'},{n:'Miekka',el:'x_sword'},{n:'Kitara',el:'x_guitar'}];
+const EYEC=['#6B4A2E','#2E6B4A','#2E4A6B','#6B2E2E','#4A2E6B','#2E6B6B','#6B6B2E'];
+
+const doll=document.getElementById('doll');
+let st={type:0,expr:0,skin:1,hair:0,hairc:2,outfit:0,outc:0,head:0,extra:0,bg:0,eye:0};
+
+function setV(n,v){doll.style.setProperty(n,v);}
+function show(prefix,idx,max){for(let i=0;i<max;i++){const e=document.getElementById(prefix+i);if(e)e.style.display=(i===idx?'inline':'none');}}
+function render(){
+  setV('--skin',SKIN[st.skin]);setV('--hair',HAIR[st.hairc]);setV('--outfit',OUTFIT[st.outc]);
+  const b=BG[st.bg];document.getElementById('bg').setAttribute('fill',b.c);
+  document.getElementById('pat_star').style.display=(b.p==='star'?'inline':'none');
+  document.getElementById('pat_rainbow').style.display=(b.p==='rainbow'?'inline':'none');
+  show('hair',st.hair,9);show('outfit',st.outfit,8);show('type',st.type,7);show('m',st.expr,4);
+  document.getElementById('eyeL').setAttribute('fill',EYEC[st.eye]);
+  document.getElementById('eyeR').setAttribute('fill',EYEC[st.eye]);
+  document.querySelectorAll('.hw').forEach(e=>e.style.display='none');
+  const hel=document.getElementById(HEAD[st.head].el);if(hel)hel.style.display='inline';
+  document.querySelectorAll('.ex').forEach(e=>e.style.display='none');
+  if(EXTRA[st.extra]&&EXTRA[st.extra].el){const xe=document.getElementById(EXTRA[st.extra].el);if(xe)xe.style.display='inline';}
+  document.querySelectorAll('[data-pick]').forEach(b=>{const[k,i]=b.dataset.pick.split(':');const on=st[k]==i;b.style.outline=(on?'3px solid #FFD93B':'none');b.style.outlineOffset='2px';});
+}
+function pick(k,i){st[k]=parseInt(i);render();}
+function rnd(a){return Math.floor(Math.random()*a.length);}
+function surprise(){st.type=rnd(TYPES);st.expr=rnd(EXPR);st.skin=rnd(SKIN);st.hair=rnd(HAIRSTYLES);st.hairc=rnd(HAIR);st.outfit=rnd(OUTFITS);st.outc=rnd(OUTFIT);st.head=rnd(HEAD);st.extra=rnd(EXTRA);st.bg=rnd(BG);st.eye=rnd(EYEC);render();}
+
+function row(label,key,items,colors){
+  let h='<div><div class="row-label">'+label+'</div><div class="btns">';
+  items.forEach((it,i)=>{
+    if(colors){const col=(it.c!==undefined?it.c:it);h+='<button data-pick="'+key+':'+i+'" class="swatch" onclick="pick(\''+key+'\','+i+')" style="background:'+col+';" title="'+col+'"></button>';}
+    else{const lbl=(it.n!==undefined?it.n:it);h+='<button data-pick="'+key+':'+i+'" class="btn" onclick="pick(\''+key+'\','+i+'\')">'+lbl+'</button>';}
+  });
+  return h+'</div></div>';
+}
+document.getElementById('panel').innerHTML=
+  row('Hahmo','type',TYPES,false)+
+  row('Ilme','expr',EXPR,false)+
+  row('Hiusmalli','hair',HAIRSTYLES,false)+
+  row('Hiusten väri','hairc',HAIR,true)+
+  row('Silmien väri','eye',EYEC,true)+
+  row('Vaatteet','outfit',OUTFITS,false)+
+  row('Vaatteiden väri','outc',OUTFIT,true)+
+  row('Päähine','head',HEAD,false)+
+  row('Lisäosa','extra',EXTRA,false)+
+  row('Ihonväri','skin',SKIN,true)+
+  row('Tausta','bg',BG,true)+
+  '<button class="save-btn" onclick="savePng()">📸 Tallenna kuva</button>';
+
+function savePng(){
+  const s=new XMLSerializer();const str=s.serializeToString(doll);
+  const blob=new Blob([str],{type:'image/svg+xml'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='hahmo.svg';a.click();
+}
+render();
+</script>
+</body>
+</html>
