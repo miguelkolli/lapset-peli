@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma ja Elsa seikkailee eri maailmoissa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* STARS */
+#stars{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle 2s infinite alternate;}
+@keyframes twinkle{from{opacity:0.2;transform:scale(1);}to{opacity:1;transform:scale(1.4);}}
+
+/* TITLE SCREEN */
+#titlescreen{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0040 0%,#0a0015 100%);}
+.title-main{font-size:clamp(28px,6vw,56px);font-weight:900;color:#FFD93B;text-shadow:0 0 30px #FF6FA4,0 0 60px #7C6BF0;text-align:center;line-height:1.2;animation:pulse 2s infinite alternate;}
+.title-sub{font-size:clamp(14px,3vw,22px);color:#C8A2F0;margin:12px 0 40px;text-align:center;}
+@keyframes pulse{from{text-shadow:0 0 20px #FF6FA4,0 0 40px #7C6BF0;}to{text-shadow:0 0 40px #FF6FA4,0 0 80px #7C6BF0,0 0 120px #FFD93B;}}
+.world-select{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;max-width:800px;width:90%;padding:0 16px;}
+.world-btn{padding:18px 10px;border-radius:18px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:15px;font-weight:700;color:#fff;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:8px;backdrop-filter:blur(4px);}
+.world-btn:hover{transform:scale(1.07);border-color:#FFD93B;box-shadow:0 0 20px rgba(255,217,59,0.4);}
+.world-btn .wicon{font-size:36px;}
+.world-btn.space{background:linear-gradient(135deg,#0d0d2b,#1a1a4e);}
+.world-btn.ocean{background:linear-gradient(135deg,#003366,#006699);}
+.world-btn.jungle{background:linear-gradient(135deg,#0d2b0d,#1a5c1a);}
+.world-btn.ice{background:linear-gradient(135deg,#0d2b40,#a8d8ea);}
+.world-btn.fairy{background:linear-gradient(135deg,#2d0d3d,#8B4DB8);}
+.world-btn.mushroom{background:linear-gradient(135deg,#2b0d0d,#cc4444);}
+.world-btn.future{background:linear-gradient(135deg,#0d1a2b,#00cccc);}
+.world-btn.circus{background:linear-gradient(135deg,#2b0000,#cc2200);}
+
+/* GAME SCREEN */
+#gamescreen{position:relative;z-index:10;display:none;min-height:100vh;}
+#worldbg{position:fixed;inset:0;z-index:1;transition:background 0.8s;}
+#worldbg-overlay{position:fixed;inset:0;z-index:2;pointer-events:none;}
+
+.game-ui{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;padding:10px 8px 20px;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:900px;margin-bottom:10px;}
+.world-title{font-size:clamp(16px,4vw,26px);font-weight:800;color:#FFD93B;text-shadow:0 0 12px currentColor;}
+.back-btn{padding:8px 16px;border-radius:12px;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.4);color:#fff;font-size:14px;cursor:pointer;transition:all 0.15s;backdrop-filter:blur(4px);}
+.back-btn:hover{border-color:#FFD93B;background:rgba(255,217,59,0.15);}
+
+/* CHARACTER STAGE */
+.stage{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin:10px 0;}
+.char-slot{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.char-name{font-size:13px;font-weight:700;color:#FFD93B;text-shadow:0 0 8px currentColor;}
+.char-wrap{background:rgba(255,255,255,0.08);border-radius:20px;padding:6px;border:2px solid rgba(255,255,255,0.15);backdrop-filter:blur(4px);cursor:pointer;transition:all 0.2s;}
+.char-wrap:hover{border-color:#FFD93B;box-shadow:0 0 20px rgba(255,217,59,0.3);}
+.char-wrap.selected{border-color:#FF6FA4;box-shadow:0 0 24px rgba(255,111,164,0.5);}
+
+/* CONTROLS */
+.controls-area{width:100%;max-width:900px;background:rgba(0,0,0,0.55);border-radius:20px;padding:14px;border:1.5px solid rgba(255,255,255,0.12);backdrop-filter:blur(8px);}
+.selected-label{font-size:13px;color:#C8A2F0;margin-bottom:10px;text-align:center;}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.tab{padding:7px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#aaa;font-size:13px;cursor:pointer;transition:all 0.15s;}
+.tab.on{background:#7C6BF0;border-color:#9B8BFF;color:#fff;box-shadow:0 0 10px #7C6BF066;}
+.panel{display:none;}
+.panel.on{display:block;}
+.row-label{font-size:11px;font-weight:700;color:#C8A2F0;margin:8px 0 5px;text-transform:uppercase;letter-spacing:0.5px;}
+.btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+.opt{padding:7px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);font-size:13px;cursor:pointer;color:#ddd;transition:all 0.15s;}
+.opt:hover{background:rgba(255,255,255,0.14);border-color:#7C6BF0;}
+.opt.on{background:#7C6BF0;border-color:#9B8BFF;color:#fff;}
+.swatch{width:32px;height:32px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);cursor:pointer;transition:all 0.15s;}
+.swatch:hover{transform:scale(1.18);border-color:#fff;}
+.swatch.on{border:3px solid #FFD93B;box-shadow:0 0 10px #FFD93B88;transform:scale(1.12);}
+
+/* BOTTOM BUTTONS */
+.bottom-btns{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.surprise-btn{flex:1;min-width:140px;padding:12px;border:none;border-radius:14px;background:linear-gradient(90deg,#FF6FA4,#7C6BF0);color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:opacity 0.15s;}
+.surprise-btn:hover{opacity:0.85;}
+.world-change-btn{flex:1;min-width:140px;padding:12px;border:2px solid #FFD93B;border-radius:14px;background:transparent;color:#FFD93B;font-size:15px;font-weight:600;cursor:pointer;transition:all 0.15s;}
+.world-change-btn:hover{background:rgba(255,217,59,0.15);}
+
+/* WORLD FLOATING ELEMENTS */
+.floaty{position:fixed;pointer-events:none;z-index:3;font-size:28px;animation:float 6s infinite ease-in-out;}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-20px) rotate(8deg);}}
+
+@media(max-width:600px){.stage{gap:10px;}.char-wrap svg{width:140px!important;}}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<!-- TITLE SCREEN -->
+<div id="titlescreen">
+  <div class="title-main">🌟 Alma ja Elsa<br>seikkailee! 🌟</div>
+  <div class="title-sub">Valitse maailma johon haluat mennä</div>
+  <div class="world-select">
+    <button class="world-btn space" onclick="enterWorld('space')"><span class="wicon">🚀</span>Avaruus</button>
+    <button class="world-btn ocean" onclick="enterWorld('ocean')"><span class="wicon">🌊</span>Merenpohja</button>
+    <button class="world-btn jungle" onclick="enterWorld('jungle')"><span class="wicon">🌴</span>Viidakko</button>
+    <button class="world-btn ice" onclick="enterWorld('ice')"><span class="wicon">❄️</span>Jäämaailma</button>
+    <button class="world-btn fairy" onclick="enterWorld('fairy')"><span class="wicon">🧚</span>Satumaailma</button>
+    <button class="world-btn mushroom" onclick="enterWorld('mushroom')"><span class="wicon">🍄</span>Sienimaailma</button>
+    <button class="world-btn future" onclick="enterWorld('future')"><span class="wicon">🤖</span>Tulevaisuus</button>
+    <button class="world-btn circus" onclick="enterWorld('circus')"><span class="wicon">🎪</span>Sirkus</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gamescreen">
+  <div id="worldbg"></div>
+  <div id="worldbg-overlay"></div>
+  <div id="floaties"></div>
+
+  <div class="game-ui">
+    <div class="topbar">
+      <div class="world-title" id="worldTitle">🚀 Avaruus</div>
+      <button class="back-btn" onclick="goBack()">← Vaihda maailmaa</button>
+    </div>
+
+    <div class="stage">
+      <div class="char-slot">
+        <div class="char-name">⭐ Alma</div>
+        <div class="char-wrap" id="wrapA" onclick="selectChar('A')">
+          <svg id="dollA" viewBox="0 0 320 420" width="180" style="--skin:#FFE0BD;--hair:#E2574C;--outfit:#FF6FA4;"></svg>
+        </div>
+      </div>
+      <div class="char-slot">
+        <div class="char-name">💜 Elsa</div>
+        <div class="char-wrap" id="wrapB" onclick="selectChar('B')">
+          <svg id="dollB" viewBox="0 0 320 420" width="180" style="--skin:#F1C27D;--hair:#5BC0EB;--outfit:#7C6BF0;"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-area">
+      <div class="selected-label" id="selLabel">✨ Valitset Almaa — klikkaa hahmoa vaihtaaksesi!</div>
+
+      <div class="tabs">
+        <button class="tab on" onclick="setTab('hahmo')">Hahmo</button>
+        <button class="tab" onclick="setTab('hiukset')">Hiukset</button>
+        <button class="tab" onclick="setTab('vaatteet')">Vaatteet</button>
+        <button class="tab" onclick="setTab('paahine')">Päähine</button>
+        <button class="tab" onclick="setTab('lisaosa')">Lisäosa</button>
+        <button class="tab" onclick="setTab('varit')">Värit</button>
+      </div>
+
+      <div id="p_hahmo" class="panel on">
+        <div class="row-label">Hahmotyyppi</div>
+        <div class="btns" id="b_type"></div>
+        <div class="row-label">Ilme</div>
+        <div class="btns" id="b_expr"></div>
+        <div class="row-label">Ihonväri</div>
+        <div class="btns" id="b_skin"></div>
+        <div class="row-label">Silmien väri</div>
+        <div class="btns" id="b_eye"></div>
+      </div>
+
+      <div id="p_hiukset" class="panel">
+        <div class="row-label">Hiusmalli</div>
+        <div class="btns" id="b_hair"></div>
+        <div class="row-label">Hiusten väri</div>
+        <div class="btns" id="b_hairc"></div>
+      </div>
+
+      <div id="p_vaatteet" class="panel">
+        <div class="row-label">Asu</div>
+        <div class="btns" id="b_outfit"></div>
+        <div class="row-label">Asun väri</div>
+        <div class="btns" id="b_outc"></div>
+      </div>
+
+      <div id="p_paahine" class="panel">
+        <div class="row-label">Päähine</div>
+        <div class="btns" id="b_head"></div>
+      </div>
+
+      <div id="p_lisaosa" class="panel">
+        <div class="row-label">Lisäosa</div>
+        <div class="btns" id="b_extra"></div>
+      </div>
+
+      <div id="p_varit" class="panel">
+        <div class="row-label">Vaatteiden väri</div>
+        <div class="btns" id="b_outc2"></div>
+        <div class="row-label">Hiusten väri</div>
+        <div class="btns" id="b_hairc2"></div>
+        <div class="row-label">Ihonväri</div>
+        <div class="btns" id="b_skin2"></div>
+      </div>
+
+      <div class="bottom-btns">
+        <button class="surprise-btn" onclick="surprise()">🎲 Yllätä minut!</button>
+        <button class="world-change-btn" onclick="goBack()">🌍 Vaihda maailmaa</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const SKIN=['#FFE9D6','#FFE0BD','#FFD1B0','#F7D7C4','#F1C27D','#E8B173','#C68642','#8D5524','#4A2F1B','#B8E994','#C8A2F0','#9BD3FF','#FF9FB2','#FF6B6B','#7EFFF5'];
+const HAIRC=['#1a0e08','#3A2A1A','#9B5A1E','#F0C84B','#E2574C','#7C5CD6','#F07CC4','#F2F2F2','#5BC0EB','#56D45B','#FF8C42','#FF4FB3','#00e5ff'];
+const OUTFC=['#FF6FA4','#7C6BF0','#34C3A6','#FFC93C','#5BA8F5','#FF8C42','#E84393','#56D45B','#FF4D6D','#9B6BF0','#E84242','#34A8C3','#fff','#FFD93B','#FF5722'];
+const EYEC=['#6B4A2E','#2E6B4A','#2E4A6B','#6B2E2E','#4A2E6B','#2E6B6B','#00e5ff','#FF4FB3'];
+
+const TYPES=['Ihminen','Kissa 🐱','Pupu 🐰','Karhu 🐻','Kettu 🦊','Lohikäärme 🐉','Klovni 🤡','Noita 🧙','Prinsessa 👸','Supersankari 🦸','Merenneito 🧜','Robotti 🤖','Yksisarvinen 🦄','Keiju 🧚','Pingviini 🐧'];
+const EXPR=['Iloinen 😊','Nauru 😄','Yllättynyt 😮','Tyyni 😌','Siisti 😎','Rakastunut 🥰'];
+const HAIRS=['Pitkät','Polkka','Letit','Kiharat','Ei hiuksia','Nuttura','Aallot','Piikit','Afro','Sivuletit','Otsahius','Lyhyet'];
+const OUTFITS=['Mekko','T-paita','Tutu','Viitta','Sirkusasu','Tähtimekko','Haalari','Bleiseri','Kimono','Haarniska','Bikinit','Astronauttiasu','Prinsessamekko','Noitakaappu','Supersankaripuku'];
+const HEADS=['Ei mitään','Kruunu 👑','Jesterihattu','Silinteri 🎩','Tähtipanta','Kukka 🌸','Rusetti','Lippis','Noitahattu','Tiara','Helmet','Kypärä','Sarvit','Korvat','Halo ✨'];
+const EXTRAS=['Ei mitään','Siivet 🪽','Taikasauva ✨','Kaulakoru','Reppu','Huivi','Lasit','Miekka','Kitara 🎸','Kilpi','Jousi & nuoli','Laterna','Kukat','Häntä','Tridentti'];
+
+const WORLDS={
+  space:{name:'🚀 Avaruus',bg:'radial-gradient(ellipse at 30% 20%,#0d0040 0%,#000015 60%,#000 100%)',floats:['🌟','⭐','🪐','🌙','☄️','🛸','💫','🌠'],outfits:[11,4],heads:[4,10],extras:[1,2]},
+  ocean:{name:'🌊 Merenpohja',bg:'radial-gradient(ellipse at 50% 0%,#003399 0%,#001155 50%,#000520 100%)',floats:['🐠','🐟','🦑','🐙','🦀','🐚','🌊','🐬'],outfits:[10,0],heads:[0,9],extras:[12,0]},
+  jungle:{name:'🌴 Viidakko',bg:'radial-gradient(ellipse at 50% 0%,#0a3d0a 0%,#052005 60%,#010e01 100%)',floats:['🦋','🌺','🦜','🐍','🌿','🦩','🌸','🍃'],outfits:[3,0],heads:[5,0],extras:[12,0]},
+  ice:{name:'❄️ Jäämaailma',bg:'radial-gradient(ellipse at 50% 0%,#a8d8ea 0%,#2255aa 40%,#001133 100%)',floats:['❄️','🌨️','🏔️','⛄','🦢','🌬️','💎','🧊'],outfits:[2,0],heads:[10,0],extras:[1,0]},
+  fairy:{name:'🧚 Satumaailma',bg:'radial-gradient(ellipse at 50% 20%,#4a0080 0%,#1a003d 60%,#0a001a 100%)',floats:['🧚','🌈','⭐','🦄','🍄','🌙','💜','🌸'],outfits:[5,12],heads:[1,9],extras:[1,2]},
+  mushroom:{name:'🍄 Sienimaailma',bg:'radial-gradient(ellipse at 50% 30%,#330000 0%,#1a0000 60%,#0a0000 100%)',floats:['🍄','🐛','🐝','🌿','💊','🌟','🦋','🐞'],outfits:[0,6],heads:[5,0],extras:[2,12]},
+  future:{name:'🤖 Tulevaisuus',bg:'radial-gradient(ellipse at 50% 0%,#001a33 0%,#000d1a 60%,#000 100%)',floats:['🤖','⚡','💻','🔮','🛸','⚙️','💡','📡'],outfits:[11,6],heads:[11,0],extras:[6,0]},
+  circus:{name:'🎪 Sirkus',bg:'radial-gradient(ellipse at 50% 0%,#330000 0%,#1a0000 60%,#000 100%)',floats:['🎪','🎭','🎠','🎡','🤹','🎯','🎈','🎶'],outfits:[4,12],heads:[1,0],extras:[2,7]},
+};
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let curWorld='space';
+let curChar='A';
+const chars={
+  A:{type:0,expr:0,skin:1,eye:0,hair:0,hairc:4,outfit:0,outc:0,head:0,extra:0},
+  B:{type:0,expr:0,skin:4,eye:2,hair:2,hairc:8,outfit:0,outc:1,head:0,extra:0},
+};
+
+// ── STARS ─────────────────────────────────────────────────────────────────
+(function makeStars(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${1+Math.random()*2.5}px;height:${1+Math.random()*2.5}px;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*3}s;`;
+    c.appendChild(s);
+  }
+})();
+
+// ── SVG BUILDER ───────────────────────────────────────────────────────────
+function buildSVG(id,st){
+  const svg=document.getElementById(id);
+  svg.style.setProperty('--skin',SKIN[st.skin]);
+  svg.style.setProperty('--hair',HAIRC[st.hairc]);
+  svg.style.setProperty('--outfit',OUTFC[st.outc]);
+  svg.innerHTML=svgContent(st);
+}
+
+function svgContent(st){
+  const skin=SKIN[st.skin];const hair=HAIRC[st.hairc];const outfit=OUTFC[st.outc];const eye=EYEC[st.eye];
+  let s='';
+  // glow
+  s+=`<defs><radialGradient id="glow" cx="50%" cy="44%" r="52%"><stop offset="0%" stop-color="#fff" stop-opacity="0.3"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
+  // wings behind
+  if(st.extra===1)s+=`<path d="M100 210 Q40 170 25 240 Q60 248 100 228Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2.5"/><path d="M100 232 Q38 248 32 295 Q70 285 102 260Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2.5"/><path d="M220 210 Q280 170 295 240 Q260 248 220 228Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2.5"/><path d="M220 232 Q282 248 288 295 Q250 285 218 260Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2.5"/>`;
+  // legs
+  s+=`<rect x="130" y="295" width="20" height="75" rx="10" fill="${skin}"/><rect x="170" y="295" width="20" height="75" rx="10" fill="${skin}"/><ellipse cx="140" cy="372" rx="20" ry="12" fill="#4a3a5a"/><ellipse cx="180" cy="372" rx="20" ry="12" fill="#4a3a5a"/>`;
+  // arms
+  s+=`<rect x="82" y="205" width="20" height="78" rx="10" fill="${skin}"/><rect x="218" y="205" width="20" height="78" rx="10" fill="${skin}"/><circle cx="92" cy="287" r="13" fill="${skin}"/><circle cx="228" cy="287" r="13" fill="${skin}"/>`;
+  // outfit
+  s+=outfitSVG(st.outfit,outfit,skin);
+  // neck
+  s+=`<rect x="148" y="165" width="24" height="34" rx="11" fill="${skin}"/>`;
+  // head
+  s+=`<circle cx="160" cy="128" r="60" fill="${skin}"/>`;
+  s+=`<ellipse cx="160" cy="98" rx="18" ry="12" fill="#fff" opacity="0.1"/>`;
+  // hair behind
+  s+=hairBehind(st.hair,hair);
+  // face
+  s+=faceSVG(st.expr,eye,skin,hair);
+  // hair front
+  s+=hairFront(st.hair,hair);
+  // animal type
+  s+=typeSVG(st.type,skin);
+  // headwear
+  s+=headSVG(st.head,outfit);
+  // extra (front)
+  s+=extraFront(st.extra);
+  // glow
+  s+=`<ellipse cx="160" cy="220" rx="120" ry="165" fill="url(#glow)"/>`;
+  return s;
+}
+
+function outfitSVG(i,c,skin){
+  const o=[
+    // 0 mekko
+    `<path d="M112 185 Q160 170 208 185 L232 310 Q160 330 88 310Z" fill="${c}"/><path d="M112 185 Q160 170 208 185 L215 208 Q160 194 105 208Z" fill="#fff" opacity="0.15"/><circle cx="160" cy="238" r="7" fill="#fff" opacity="0.6"/><circle cx="160" cy="268" r="7" fill="#fff" opacity="0.6"/>`,
+    // 1 t-paita
+    `<rect x="112" y="183" width="96" height="72" rx="14" fill="${c}"/><rect x="112" y="183" width="96" height="18" rx="9" fill="#fff" opacity="0.13"/><rect x="158" y="252" width="36" height="68" rx="9" fill="#4A5568"/><rect x="126" y="252" width="36" height="68" rx="9" fill="#4A5568"/>`,
+    // 2 tutu
+    `<path d="M112 185 Q160 173 208 185 L220 246 L100 246Z" fill="${c}"/><path d="M88 246 Q160 228 232 246 L244 290 Q160 272 76 290Z" fill="#fff" opacity="0.82"/><path d="M84 282 Q160 264 236 282 L244 312 Q160 296 76 312Z" fill="${c}"/>`,
+    // 3 viitta
+    `<path d="M112 185 Q160 170 208 185 L222 308 Q160 328 98 308Z" fill="${c}"/><path d="M208 187 Q272 204 264 298 L240 288 Q246 220 206 208Z" fill="${c}" opacity="0.8"/><path d="M155 198 L165 198 L175 217 L160 230 L145 217Z" fill="#FFD93B"/>`,
+    // 4 sirkusasu
+    `<path d="M112 185 Q160 170 208 185 L228 305 Q160 325 92 305Z" fill="${c}"/><circle cx="136" cy="228" r="6" fill="#FFD93B"/><circle cx="160" cy="213" r="6" fill="#fff"/><circle cx="184" cy="228" r="6" fill="#FFD93B"/><circle cx="148" cy="262" r="6" fill="#fff"/><circle cx="172" cy="262" r="6" fill="#fff"/><path d="M92 300 Q115 286 137 300 Q160 286 183 300 Q206 286 228 300 L228 312 Q160 328 92 312Z" fill="#fff" opacity="0.88"/>`,
+    // 5 tähtimekko
+    `<path d="M112 185 Q160 170 208 185 L232 310 Q160 330 88 310Z" fill="${c}"/><path d="M136 232 l4 9 9 1 -7 7 2 9 -8 -4 -8 4 2 -9 -7 -7 9 -1 z" fill="#FFE98A"/><path d="M180 255 l3 7 8 1 -6 6 2 8 -7 -4 -7 4 2 -8 -6 -6 8 -1 z" fill="#FFE98A"/><path d="M155 280 l3 7 8 1 -6 6 2 8 -7 -4 -7 4 2 -8 -6 -6 8 -1 z" fill="#fff"/>`,
+    // 6 haalari
+    `<rect x="112" y="200" width="96" height="112" rx="12" fill="${c}"/><rect x="120" y="180" width="14" height="40" rx="7" fill="${c}"/><rect x="186" y="180" width="14" height="40" rx="7" fill="${c}"/><rect x="140" y="240" width="40" height="28" rx="5" fill="#fff" opacity="0.5"/><circle cx="132" cy="214" r="4" fill="#FFD93B"/><circle cx="188" cy="214" r="4" fill="#FFD93B"/>`,
+    // 7 bleiseri
+    `<rect x="112" y="183" width="96" height="80" rx="14" fill="${c}"/><path d="M152 183 L140 200 L160 218 L180 200 L168 183Z" fill="#fff" opacity="0.4"/><rect x="126" y="260" width="36" height="66" rx="9" fill="#2d2d2d"/><rect x="158" y="260" width="36" height="66" rx="9" fill="#2d2d2d"/>`,
+    // 8 kimono
+    `<path d="M110 185 Q160 170 210 185 L235 315 Q160 340 85 315Z" fill="${c}"/><path d="M110 185 L85 310 Q120 320 140 308 L150 185Z" fill="${c}" opacity="0.7"/><path d="M210 185 L235 310 Q200 320 180 308 L170 185Z" fill="${c}" opacity="0.7"/><path d="M148 185 L172 185 L180 215 L160 225 L140 215Z" fill="#fff" opacity="0.4"/>`,
+    // 9 haarniska
+    `<path d="M108 182 Q160 166 212 182 L238 315 Q160 342 82 315Z" fill="#808080"/><path d="M108 182 Q160 166 212 182 L220 210 Q160 196 100 210Z" fill="#aaa"/><path d="M130 240 L190 240 L200 290 L160 305 L120 290Z" fill="#696969"/><circle cx="160" cy="252" r="8" fill="#aaa"/>`,
+    // 10 bikinit
+    `<path d="M130 185 Q160 178 190 185 L196 215 L124 215Z" fill="${c}"/><path d="M120 250 Q160 238 200 250 L210 310 Q160 325 110 310Z" fill="${c}"/>`,
+    // 11 astronauttias
+    `<path d="M106 180 Q160 162 214 180 L240 318 Q160 346 80 318Z" fill="#ddd"/><path d="M106 180 Q160 162 214 180 L222 212 Q160 198 98 212Z" fill="#fff" opacity="0.5"/><rect x="138" y="240" width="44" height="32" rx="6" fill="#5BA8F5" opacity="0.8"/><circle cx="132" cy="210" r="5" fill="#FFD93B"/><circle cx="188" cy="210" r="5" fill="#FFD93B"/>`,
+    // 12 prinsessamekko
+    `<path d="M112 185 Q160 170 208 185 L265 330 Q160 365 55 330Z" fill="${c}"/><path d="M112 185 Q160 170 208 185 L215 210 Q160 196 105 210Z" fill="#fff" opacity="0.25"/><path d="M88 295 Q125 275 160 278 Q195 275 232 295 Q195 310 160 308 Q125 310 88 295Z" fill="#fff" opacity="0.3"/><circle cx="160" cy="240" r="8" fill="#FFD93B"/><circle cx="135" cy="265" r="5" fill="#FFE98A"/><circle cx="185" cy="265" r="5" fill="#FFE98A"/>`,
+    // 13 noitakaappu
+    `<path d="M110 185 Q160 168 210 185 L245 325 Q160 355 75 325Z" fill="${c}"/><path d="M210 188 Q285 210 278 325 L248 312 Q255 228 208 208Z" fill="${c}" opacity="0.75"/>`,
+    // 14 supersankaripuku
+    `<path d="M112 185 Q160 170 208 185 L235 315 Q160 340 85 315Z" fill="${c}"/><path d="M208 188 Q270 208 262 312 L236 302 Q242 225 206 208Z" fill="${c}" opacity="0.8"/><path d="M148 192 L172 192 L185 218 L160 235 L135 218Z" fill="#FFD93B"/><path d="M85 305 Q115 285 135 295 L120 325 Q90 318 85 305Z" fill="${c}"/><path d="M235 305 Q205 285 185 295 L200 325 Q230 318 235 305Z" fill="${c}"/>`,
+  ];
+  return o[i]||o[0];
+}
+
+function hairBehind(i,c){
+  const h=[
+    `<path d="M98 128 Q90 50 160 52 Q230 50 222 128 Q228 192 205 222 L190 206 Q208 143 160 124 Q112 143 130 206 L115 222 Q92 192 98 128Z" fill="${c}"/><path d="M102 76 Q160 50 218 76 Q170 90 160 95 Q150 90 102 76Z" fill="${c}"/>`,
+    `<path d="M100 130 Q93 55 160 53 Q227 55 220 130 Q222 162 212 174 L205 140 Q196 100 160 100 Q124 100 115 140 L108 174 Q98 162 100 130Z" fill="${c}"/>`,
+    `<path d="M104 110 Q110 58 160 58 Q210 58 216 110 Q186 87 160 90 Q134 87 104 110Z" fill="${c}"/><circle cx="98" cy="143" r="25" fill="${c}"/><circle cx="222" cy="143" r="25" fill="${c}"/><circle cx="91" cy="175" r="18" fill="${c}"/><circle cx="229" cy="175" r="18" fill="${c}"/>`,
+    `<circle cx="160" cy="78" r="39" fill="${c}"/><circle cx="120" cy="94" r="33" fill="${c}"/><circle cx="200" cy="94" r="33" fill="${c}"/><circle cx="105" cy="125" r="25" fill="${c}"/><circle cx="215" cy="125" r="25" fill="${c}"/>`,
+    ``,
+    `<path d="M104 110 Q110 60 160 60 Q210 60 216 110 Q186 87 160 90 Q134 87 104 110Z" fill="${c}"/><circle cx="160" cy="57" r="22" fill="${c}"/>`,
+    `<path d="M96 128 Q88 52 160 52 Q232 52 224 128 Q235 198 205 240 Q215 204 200 164 Q212 205 195 238 L183 215 Q200 150 160 126 Q120 150 137 215 L125 238 Q108 205 120 164 Q105 204 115 240 Q85 198 96 128Z" fill="${c}"/>`,
+    `<path d="M120 92 L134 46 L146 86 L160 40 L174 86 L186 46 L200 92 Q160 80 120 92Z" fill="${c}"/><path d="M110 100 Q160 83 210 100 Q207 125 198 135 L192 107 Q160 95 128 107 L122 135 Q113 125 110 100Z" fill="${c}"/>`,
+    `<circle cx="160" cy="85" r="52" fill="${c}"/>`,
+    `<path d="M98 128 Q90 50 160 52 Q230 50 222 128 L220 134 Q196 82 160 88 Q124 82 100 134Z" fill="${c}"/><path d="M100 134 Q124 82 160 88 Q196 82 220 134 L222 165 Q186 112 160 120 Q134 112 98 165Z" fill="${c}" opacity="0.8"/>`,
+    `<path d="M98 128 Q90 50 160 52 Q230 50 222 128 Q228 192 200 232 L185 210 Q205 148 160 125 Q115 148 135 210 L120 232 Q92 192 98 128Z" fill="${c}"/>`,
+    `<path d="M100 130 Q93 55 160 53 Q227 55 220 130 Q222 164 210 178 L202 142 Q194 100 160 100 Q126 100 118 142 L110 178 Q98 164 100 130Z" fill="${c}"/>`,
+  ];
+  return h[i]||h[0];
+}
+
+function hairFront(i,c){
+  const f=[
+    `<path d="M102 80 Q138 60 178 64 Q152 76 136 93Z" fill="#fff" opacity="0.16"/>`,
+    `<path d="M102 82 Q138 65 178 70 Q152 82 136 98Z" fill="#fff" opacity="0.14"/>`,
+    ``,``,``,
+    `<circle cx="154" cy="56" r="8" fill="#fff" opacity="0.18"/>`,
+    ``,``,``,``,``,``,
+  ];
+  return f[i]||'';
+}
+
+function faceSVG(expr,eye,skin,hair){
+  let s='';
+  // brows
+  s+=`<path d="M128 115 Q138 108 148 115" stroke="${hair}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M172 115 Q182 108 192 115" stroke="${hair}" stroke-width="4.5" fill="none" stroke-linecap="round"/>`;
+  // eye whites
+  s+=`<ellipse cx="138" cy="128" rx="10" ry="12" fill="#fff"/>`;
+  s+=`<ellipse cx="182" cy="128" rx="10" ry="12" fill="#fff"/>`;
+  // irises
+  s+=`<circle cx="138" cy="129" r="6.5" fill="${eye}"/>`;
+  s+=`<circle cx="182" cy="129" r="6.5" fill="${eye}"/>`;
+  // pupils
+  s+=`<circle cx="138" cy="129" r="3" fill="#111"/>`;
+  s+=`<circle cx="182" cy="129" r="3" fill="#111"/>`;
+  // shine
+  s+=`<circle cx="135" cy="125" r="2.2" fill="#fff"/>`;
+  s+=`<circle cx="179" cy="125" r="2.2" fill="#fff"/>`;
+  // lashes
+  s+=`<line x1="129" y1="118" x2="126" y2="114" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>`;
+  s+=`<line x1="148" y1="118" x2="151" y2="114" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>`;
+  s+=`<line x1="173" y1="118" x2="170" y2="114" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>`;
+  s+=`<line x1="192" y1="118" x2="195" y2="114" stroke="#222" stroke-width="1.8" stroke-linecap="round"/>`;
+  // cheeks
+  s+=`<ellipse cx="120" cy="146" rx="9" ry="6" fill="#FF9BB3" opacity="0.5"/>`;
+  s+=`<ellipse cx="200" cy="146" rx="9" ry="6" fill="#FF9BB3" opacity="0.5"/>`;
+  // nose
+  s+=`<ellipse cx="160" cy="148" rx="3" ry="4" fill="#000" opacity="0.06"/>`;
+  // mouths
+  const mouths=[
+    `<path d="M147 156 Q160 168 173 156" stroke="#C0506B" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M145 154 Q160 175 175 154 Q160 164 145 154Z" fill="#9B3A52"/><path d="M152 164 Q160 170 168 164 Q160 168 152 164Z" fill="#FF7E9D"/>`,
+    `<ellipse cx="160" cy="162" rx="8" ry="10" fill="#9B3A52"/>`,
+    `<path d="M149 158 Q160 164 171 158" stroke="#C0506B" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
+    `<path d="M147 156 Q160 168 173 156" stroke="#C0506B" stroke-width="3.5" fill="none" stroke-linecap="round"/><circle cx="160" cy="140" r="5" fill="#FFD93B"/>`,
+    `<path d="M145 154 Q160 172 175 154 Q160 162 145 154Z" fill="#C0506B"/><circle cx="148" cy="148" r="3" fill="#FF9BB3" opacity="0.8"/><circle cx="172" cy="148" r="3" fill="#FF9BB3" opacity="0.8"/>`,
+  ];
+  s+=mouths[expr]||mouths[0];
+  return s;
+}
+
+function typeSVG(i,skin){
+  const types=[
+    ``,
+    // kissa
+    `<path d="M108 80 L118 34 L148 72Z" fill="${skin}"/><path d="M212 80 L202 34 L172 72Z" fill="${skin}"/><path d="M114 70 L120 46 L140 70Z" fill="#FF9BB3"/><path d="M206 70 L200 46 L180 70Z" fill="#FF9BB3"/><circle cx="160" cy="144" r="3" fill="#E07A9B"/><line x1="120" y1="148" x2="92" y2="142" stroke="#9b8a7a" stroke-width="2"/><line x1="120" y1="155" x2="94" y2="158" stroke="#9b8a7a" stroke-width="2"/><line x1="200" y1="148" x2="228" y2="142" stroke="#9b8a7a" stroke-width="2"/><line x1="200" y1="155" x2="226" y2="158" stroke="#9b8a7a" stroke-width="2"/>`,
+    // pupu
+    `<ellipse cx="133" cy="44" rx="14" ry="38" fill="${skin}" transform="rotate(-10 133 44)"/><ellipse cx="187" cy="44" rx="14" ry="38" fill="${skin}" transform="rotate(10 187 44)"/><ellipse cx="133" cy="48" rx="7" ry="26" fill="#FF9BB3" transform="rotate(-10 133 48)"/><ellipse cx="187" cy="48" rx="7" ry="26" fill="#FF9BB3" transform="rotate(10 187 48)"/><circle cx="160" cy="144" r="5" fill="#E07A9B"/>`,
+    // karhu
+    `<circle cx="120" cy="76" r="24" fill="${skin}"/><circle cx="200" cy="76" r="24" fill="${skin}"/><circle cx="120" cy="76" r="13" fill="#C68B6B"/><circle cx="200" cy="76" r="13" fill="#C68B6B"/><circle cx="160" cy="144" r="6" fill="#5A3A2A"/>`,
+    // kettu
+    `<path d="M106 84 L114 30 L148 76Z" fill="${skin}"/><path d="M214 84 L206 30 L172 76Z" fill="${skin}"/><path d="M114 74 L120 44 L142 72Z" fill="#fff"/><path d="M206 74 L200 44 L178 72Z" fill="#fff"/><path d="M160 144 Q155 154 148 156 Q160 148 172 156 Q165 154 160 144Z" fill="#2A1A0A"/>`,
+    // lohikäärme
+    `<path d="M120 68 L110 24 L145 64Z" fill="#5f8"/><path d="M200 68 L210 24 L175 64Z" fill="#5f8"/><path d="M128 60 L118 34 L140 60Z" fill="#9fefa0" opacity="0.7"/><path d="M192 60 L202 34 L180 60Z" fill="#9fefa0" opacity="0.7"/><circle cx="160" cy="146" r="5" fill="#2A6B2A"/>`,
+    // klovni
+    `<circle cx="160" cy="145" r="12" fill="#FF4D4D"/><circle cx="156" cy="140" r="4" fill="#fff" opacity="0.6"/><circle cx="124" cy="154" r="13" fill="#FF6F91" opacity="0.7"/><circle cx="196" cy="154" r="13" fill="#FF6F91" opacity="0.7"/>`,
+    // noita
+    `<ellipse cx="136" cy="125" rx="9" ry="12" fill="#7C6BF0" opacity="0.5"/><ellipse cx="184" cy="125" rx="9" ry="12" fill="#7C6BF0" opacity="0.5"/>`,
+    // prinsessa
+    `<path d="M122 110 Q138 105 154 110" stroke="#FFD93B" stroke-width="2" fill="none" opacity="0.6"/><path d="M166 110 Q182 105 198 110" stroke="#FFD93B" stroke-width="2" fill="none" opacity="0.6"/>`,
+    // supersankari
+    `<path d="M130 148 Q140 140 150 148" stroke="#FFD93B" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M170 148 Q180 140 190 148" stroke="#FFD93B" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    // merenneito
+    `<circle cx="160" cy="145" r="4" fill="#34C3A6"/><line x1="120" y1="148" x2="90" y2="142" stroke="#34C3A6" stroke-width="1.5" opacity="0.6"/><line x1="200" y1="148" x2="230" y2="142" stroke="#34C3A6" stroke-width="1.5" opacity="0.6"/>`,
+    // robotti
+    `<rect x="120" y="110" width="22" height="16" rx="4" fill="#5BA8F5" opacity="0.5"/><rect x="178" y="110" width="22" height="16" rx="4" fill="#5BA8F5" opacity="0.5"/>`,
+    // yksisarvinen
+    `<path d="M155 68 L165 68 L160 32Z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
+    // keiju
+    `<circle cx="110" cy="100" r="6" fill="#FFD93B" opacity="0.8"/><circle cx="210" cy="100" r="6" fill="#FFD93B" opacity="0.8"/>`,
+    // pingviini
+    `<ellipse cx="160" cy="145" rx="12" ry="8" fill="#FF8C42"/><ellipse cx="135" cy="138" rx="6" ry="4" fill="#FF8C42" transform="rotate(-20 135 138)"/><ellipse cx="185" cy="138" rx="6" ry="4" fill="#FF8C42" transform="rotate(20 185 138)"/>`,
+  ];
+  return types[i]||'';
+}
+
+function headSVG(i,c){
+  const h=[
+    ``,
+    `<path d="M126 76 L138 94 L160 78 L182 94 L194 76 L198 98 Q160 106 122 98Z" fill="#FFD93B" stroke="#E8B400" stroke-width="2.5"/><circle cx="160" cy="80" r="6" fill="#FF5E8A"/><circle cx="138" cy="91" r="3.5" fill="#5BA8F5"/><circle cx="182" cy="91" r="3.5" fill="#5BA8F5"/>`,
+    `<path d="M128 78 Q160 46 192 78 Q196 64 160 56 Q124 64 128 78Z" fill="#6FCF97"/><path d="M128 78 L118 56 Q118 46 134 52Z" fill="#FF5E8A"/><path d="M160 56 L160 32 Q150 29 156 48Z" fill="#FFD93B"/><path d="M192 78 L202 56 Q202 46 186 52Z" fill="#5BA8F5"/><circle cx="118" cy="56" r="6" fill="#FFD93B"/><circle cx="160" cy="32" r="6" fill="#FF5E8A"/><circle cx="202" cy="56" r="6" fill="#5BA8F5"/>`,
+    `<rect x="133" y="36" width="54" height="42" rx="5" fill="#2a2a3a"/><rect x="120" y="74" width="80" height="10" rx="5" fill="#2a2a3a"/><rect x="133" y="64" width="54" height="10" fill="#FF5E8A"/>`,
+    `<path d="M110 93 Q160 77 210 93" stroke="#7C6BF0" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M160 56 l6 13 14 1 -10 10 3 14 -13 -7 -13 7 3 -14 -10 -10 14 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
+    `<circle cx="120" cy="82" r="9" fill="#FF5E8A"/><circle cx="109" cy="74" r="8" fill="#FFD93B"/><circle cx="131" cy="74" r="8" fill="#FFD93B"/><circle cx="114" cy="68" r="8" fill="#FFD93B"/><circle cx="126" cy="68" r="8" fill="#FFD93B"/><circle cx="120" cy="82" r="5" fill="#FF8C42"/>`,
+    `<path d="M156 71 Q130 58 128 77 Q130 94 156 82Z" fill="#FF5E8A"/><path d="M164 71 Q190 58 192 77 Q190 94 164 82Z" fill="#FF5E8A"/><circle cx="160" cy="76" r="8" fill="#E84393"/>`,
+    `<path d="M104 106 Q160 88 216 106 Q216 118 160 122 Q104 118 104 106Z" fill="${c}"/><circle cx="160" cy="58" r="30" fill="${c}"/><circle cx="160" cy="58" r="10" fill="#FFD93B"/>`,
+    `<path d="M140 96 L160 15 L180 96Z" fill="#1a1a28"/><path d="M120 104 Q160 90 200 104 Q200 115 160 118 Q120 115 120 104Z" fill="#1a1a28"/><path d="M150 72 L160 30 L165 60Z" fill="#7C6BF0" opacity="0.5"/>`,
+    `<path d="M130 88 Q160 72 190 88 L192 96 Q160 108 128 96Z" fill="#C0A060" stroke="#E8C840" stroke-width="2"/><circle cx="160" cy="78" r="5" fill="#FF5E8A"/><circle cx="140" cy="85" r="3" fill="#5BA8F5"/><circle cx="180" cy="85" r="3" fill="#5BA8F5"/>`,
+    `<path d="M110 96 Q160 80 210 96" stroke="#FFD93B" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="130" cy="89" r="5" fill="#FF5E8A"/><circle cx="160" cy="84" r="5" fill="#5BA8F5"/><circle cx="190" cy="89" r="5" fill="#56D45B"/>`,
+    `<rect x="120" y="70" width="80" height="45" rx="10" fill="#808080"/><rect x="128" y="78" width="64" height="30" rx="6" fill="#4a4a4a"/><circle cx="160" cy="62" r="10" fill="#808080"/>`,
+    `<path d="M140 80 L148 50 L155 78Z" fill="${c}"/><path d="M180 80 L172 50 L165 78Z" fill="${c}"/>`,
+    `<path d="M108 68 L120 34 L148 64Z" fill="${c}" opacity="0.85"/><path d="M212 68 L200 34 L172 64Z" fill="${c}" opacity="0.85"/>`,
+    `<circle cx="160" cy="60" r="16" fill="#FFD93B" opacity="0.85"/><circle cx="160" cy="60" r="10" fill="#fff" opacity="0.5"/>`,
+  ];
+  return h[i]||'';
+}
+
+function extraFront(i){
+  const e=[
+    ``,``,
+    // taikasauva
+    `<line x1="228" y1="287" x2="255" y2="224" stroke="#A9743C" stroke-width="6" stroke-linecap="round"/><path d="M255 205 l6 13 14 1 -11 10 4 14 -13 -8 -13 8 4 -14 -11 -10 14 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
+    // kaulakoru
+    `<path d="M143 178 Q160 196 177 178" stroke="#FFD93B" stroke-width="4" fill="none"/><circle cx="160" cy="194" r="8" fill="#5BA8F5" stroke="#2E7BC4" stroke-width="2"/>`,
+    // reppu
+    `<rect x="58" y="200" width="36" height="46" rx="10" fill="#8C5A3C"/><rect x="68" y="193" width="16" height="12" rx="5" fill="#6B3A24"/><rect x="68" y="225" width="16" height="4" rx="2" fill="#6B3A24"/>`,
+    // huivi
+    `<path d="M134 172 Q160 188 186 172 L190 185 Q160 200 130 185Z" fill="#FF5E8A"/><path d="M168 186 L180 228 L164 228 L160 190Z" fill="#FF5E8A"/>`,
+    // lasit
+    `<rect x="120" y="120" width="34" height="24" rx="11" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3.5"/><rect x="166" y="120" width="34" height="24" rx="11" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3.5"/><line x1="154" y1="128" x2="166" y2="128" stroke="#333" stroke-width="3"/>`,
+    // miekka
+    `<rect x="218" y="218" width="7" height="82" rx="3.5" fill="#C0C0C0"/><rect x="207" y="258" width="29" height="7" rx="3.5" fill="#8B6914"/><circle cx="221" cy="218" r="6" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
+    // kitara
+    `<ellipse cx="92" cy="275" rx="20" ry="23" fill="#8B4513"/><ellipse cx="92" cy="275" rx="9" ry="10" fill="#000" opacity="0.4"/><rect x="89" y="208" width="7" height="74" rx="3.5" fill="#8B4513"/><rect x="80" y="206" width="24" height="12" rx="4" fill="#6B3410"/><line x1="89" y1="215" x2="89" y2="280" stroke="#fff" stroke-width="1.2" opacity="0.6"/><line x1="93" y1="215" x2="93" y2="280" stroke="#fff" stroke-width="1.2" opacity="0.6"/>`,
+    // kilpi
+    `<path d="M86 210 Q86 258 106 290 Q106 260 86 210Z" fill="#C0A060" stroke="#8B6914" stroke-width="2"/><path d="M86 210 L110 200 L134 210 L134 258 Q110 280 86 258Z" fill="#8B4513" stroke="#6B3410" stroke-width="2"/><circle cx="110" cy="235" r="10" fill="#C0A060"/>`,
+    // jousi
+    `<path d="M270 170 Q295 225 270 280" stroke="#8B4513" stroke-width="5" fill="none" stroke-linecap="round"/><line x1="270" y1="170" x2="270" y2="280" stroke="#C8A060" stroke-width="1.5"/><line x1="240" y1="225" x2="290" y2="210" stroke="#C8A060" stroke-width="2"/>`,
+    // laterna
+    `<rect x="228" y="255" width="16" height="22" rx="4" fill="#4a3800"/><circle cx="236" cy="264" r="9" fill="#FFE98A" opacity="0.9"/><line x1="236" y1="248" x2="236" y2="255" stroke="#666" stroke-width="2"/>`,
+    // kukat
+    `<circle cx="110" cy="96" r="9" fill="#FF5E8A"/><circle cx="99" cy="88" r="8" fill="#FFD93B"/><circle cx="121" cy="88" r="8" fill="#FFD93B"/><circle cx="104" cy="82" r="8" fill="#FF8C42"/><circle cx="116" cy="82" r="8" fill="#56D45B"/><circle cx="110" cy="96" r="5" fill="#fff"/>`,
+    // häntä
+    `<path d="M230 310 Q270 270 265 230 Q260 200 248 220 Q240 240 250 258 Q255 275 232 295Z" fill="#C68642"/>`,
+    // tridentti
+    `<line x1="278" y1="170" x2="278" y2="305" stroke="#808080" stroke-width="6" stroke-linecap="round"/><line x1="260" y1="170" x2="260" y2="205" stroke="#808080" stroke-width="4" stroke-linecap="round"/><line x1="296" y1="170" x2="296" y2="205" stroke="#808080" stroke-width="4" stroke-linecap="round"/><path d="M256 170 Q260 155 264 170" stroke="#808080" stroke-width="4" fill="none"/><path d="M274 170 Q278 155 282 170" stroke="#808080" stroke-width="4" fill="none"/><path d="M292 170 Q296 155 300 170" stroke="#808080" stroke-width="4" fill="none"/>`,
+  ];
+  return e[i]||'';
+}
+
+// ── WORLD ─────────────────────────────────────────────────────────────────
+function enterWorld(w){
+  curWorld=w;
+  const wd=WORLDS[w];
+  document.getElementById('titlescreen').style.display='none';
+  document.getElementById('gamescreen').style.display='block';
+  document.getElementById('worldbg').style.background=wd.bg;
+  document.getElementById('worldTitle').textContent=wd.name;
+  // floaties
+  const fc=document.getElementById('floaties');
+  fc.innerHTML='';
+  wd.floats.forEach((f,i)=>{
+    const d=document.createElement('div');
+    d.className='floaty';
+    d.textContent=f;
+    d.style.cssText=`left:${5+Math.random()*88}%;top:${10+Math.random()*75}%;animation-delay:${i*0.8}s;font-size:${22+Math.random()*24}px;`;
+    fc.appendChild(d);
+  });
+  renderAll();
+  buildControls();
+  selectChar('A');
+}
+
+function goBack(){
+  document.getElementById('titlescreen').style.display='flex';
+  document.getElementById('gamescreen').style.display='none';
+}
+
+// ── CONTROLS ──────────────────────────────────────────────────────────────
+function buildControls(){
+  btn('b_type',TYPES,'type',false);
+  btn('b_expr',EXPR,'expr',false);
+  btn('b_skin',SKIN,'skin',true);
+  btn('b_eye',EYEC,'eye',true);
+  btn('b_hair',HAIRS,'hair',false);
+  btn('b_hairc',HAIRC,'hairc',true);
+  btn('b_outfit',OUTFITS,'outfit',false);
+  btn('b_outc',OUTFC,'outc',true);
+  btn('b_outc2',OUTFC,'outc',true);
+  btn('b_hairc2',HAIRC,'hairc',true);
+  btn('b_skin2',SKIN,'skin',true);
+  btn('b_head',HEADS,'head',false);
+  btn('b_extra',EXTRAS,'extra',false);
+  refreshActive();
+}
+
+function btn(id,arr,key,colors){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML='';
+  arr.forEach((it,i)=>{
+    const b=document.createElement('button');
+    if(colors){
+      b.className='swatch';
+      b.style.background=it;
+      b.title=it;
+    } else {
+      b.className='opt';
+      b.textContent=(it.n!==undefined?it.n:it);
+    }
+    b.dataset.key=key;b.dataset.idx=i;
+    b.onclick=()=>pick(key,i);
+    el.appendChild(b);
+  });
+}
+
+function refreshActive(){
+  const st=chars[curChar];
+  document.querySelectorAll('[data-key]').forEach(b=>{
+    const k=b.dataset.key;const i=parseInt(b.dataset.idx);
+    const on=st[k]===i;
+    if(b.classList.contains('swatch')){
+      b.classList.toggle('on',on);
+    } else {
+      b.classList.toggle('on',on);
+    }
+  });
+}
+
+let curTab='hahmo';
+function setTab(t){
+  curTab=t;
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    const tabs=['hahmo','hiukset','vaatteet','paahine','lisaosa','varit'];
+    b.classList.toggle('on',tabs[i]===t);
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p_'+t).classList.add('on');
+}
+
+function selectChar(c){
+  curChar=c;
+  document.getElementById('wrapA').classList.toggle('selected',c==='A');
+  document.getElementById('wrapB').classList.toggle('selected',c==='B');
+  document.getElementById('selLabel').textContent= c==='A'?'⭐ Muokkaat Almaa':'💜 Muokkaat Elsaa';
+  refreshActive();
+}
+
+function pick(key,i){
+  chars[curChar][key]=i;
+  buildSVG('doll'+curChar,chars[curChar]);
+  refreshActive();
+}
+
+function renderAll(){
+  buildSVG('dollA',chars.A);
+  buildSVG('dollB',chars.B);
+}
+
+function rnd(a){return Math.floor(Math.random()*a.length);}
+function surprise(){
+  const st=chars[curChar];
+  const wd=WORLDS[curWorld];
+  st.type=rnd(TYPES);st.expr=rnd(EXPR);st.skin=rnd(SKIN);st.eye=rnd(EYEC);
+  st.hair=rnd(HAIRS);st.hairc=rnd(HAIRC);
+  st.outfit=wd.outfits[Math.random()<0.5?0:1]||rnd(OUTFITS);
+  st.outc=rnd(OUTFC);st.head=wd.heads[Math.random()<0.5?0:1]||rnd(HEADS);
+  st.extra=wd.extras[Math.random()<0.5?0:1]||rnd(EXTRAS);
+  buildSVG('doll'+curChar,st);
+  refreshActive();
+}
+</script>
+</body>
+</html>
