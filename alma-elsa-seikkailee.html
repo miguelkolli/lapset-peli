@@ -2,19 +2,36 @@
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Alma ja Elsa seikkailee!</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Alma ja Elsa seikkailee yhdessä!</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh;overflow:hidden;}
 
-/* ── TITLE ── */
-#titleScreen{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(ellipse at center,#1a0040,#0a0015);}
-.t-title{font-size:clamp(26px,6vw,52px);font-weight:900;color:#FFD93B;text-shadow:0 0 30px #FF6FA4,0 0 60px #7C6BF0;text-align:center;animation:glow 2s infinite alternate;}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;overflow-y:auto;}
+.screen.on{display:flex;}
+
+/* IDENTITY */
+#idScreen{z-index:300;justify-content:center;background:radial-gradient(ellipse at center,#1a0040,#0a0015);}
+.big-title{font-size:clamp(26px,6vw,50px);font-weight:900;color:#FFD93B;text-shadow:0 0 30px #FF6FA4,0 0 60px #7C6BF0;text-align:center;animation:glow 2s infinite alternate;}
 @keyframes glow{from{text-shadow:0 0 20px #FF6FA4;}to{text-shadow:0 0 50px #FF6FA4,0 0 90px #FFD93B;}}
-.t-sub{color:#C8A2F0;font-size:16px;margin:10px 0 32px;text-align:center;}
+.subt{color:#C8A2F0;font-size:17px;margin:12px 0 34px;text-align:center;}
+.id-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:0 16px;}
+.id-btn{padding:24px 30px;border-radius:22px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;font-size:20px;font-weight:800;color:#fff;display:flex;flex-direction:column;align-items:center;gap:10px;transition:all 0.18s;min-width:140px;}
+.id-btn:hover{transform:scale(1.07);}
+.id-btn .em{font-size:50px;}
+.id-btn.alma{background:linear-gradient(135deg,#3a2a00,#6a5000);border-color:#FFD93B;}
+.id-btn.alma:hover{box-shadow:0 0 28px #FFD93B66;}
+.id-btn.elsa{background:linear-gradient(135deg,#2a1a4a,#4a2a8a);border-color:#9B8BFF;}
+.id-btn.elsa:hover{box-shadow:0 0 28px #9B8BFF66;}
+.id-btn.kaveri{background:linear-gradient(135deg,#1a3a2a,#2a6a4a);border-color:#56D45B;}
+.id-btn.kaveri:hover{box-shadow:0 0 28px #56D45B66;}
+
+/* TITLE / WORLDS */
+#titleScreen{z-index:200;justify-content:center;background:radial-gradient(ellipse at center,#1a0040,#0a0015);}
+.who-badge{color:#fff;font-size:15px;margin-bottom:6px;opacity:0.85;}
 .world-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;max-width:760px;width:90%;padding:0 12px;}
-.wbtn{padding:16px 8px;border-radius:16px;border:2px solid rgba(255,255,255,0.15);cursor:pointer;font-size:14px;font-weight:700;color:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 0.18s;backdrop-filter:blur(4px);}
+.wbtn{padding:16px 8px;border-radius:16px;border:2px solid rgba(255,255,255,0.15);cursor:pointer;font-size:14px;font-weight:700;color:#fff;display:flex;flex-direction:column;align-items:center;gap:6px;transition:all 0.18s;}
 .wbtn:hover{transform:scale(1.08);border-color:#FFD93B;box-shadow:0 0 18px #FFD93B55;}
 .wbtn span{font-size:32px;}
 .wbtn.space{background:linear-gradient(135deg,#0d0d2b,#1a1a5e);}
@@ -25,21 +42,19 @@ body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh
 .wbtn.mushroom{background:linear-gradient(135deg,#2b0d0d,#cc3333);}
 .wbtn.future{background:linear-gradient(135deg,#0d1a2b,#00aacc);}
 .wbtn.circus{background:linear-gradient(135deg,#2b0000,#cc2200);}
+.id-change{margin-top:20px;color:#C8A2F0;font-size:13px;background:none;border:1px solid rgba(255,255,255,0.2);padding:7px 14px;border-radius:10px;cursor:pointer;}
 
-/* ── DRESS UP ── */
-#dressScreen{position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;overflow-y:auto;}
-.dress-bg{position:fixed;inset:0;z-index:-1;transition:background 0.5s;}
-.dress-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:860px;padding:10px 16px;margin-top:8px;}
-.dress-world-name{font-size:18px;font-weight:800;color:#FFD93B;text-shadow:0 0 10px currentColor;}
+/* DRESS */
+#dressScreen{z-index:150;}
+.dbg{position:fixed;inset:0;z-index:-1;transition:background 0.5s;}
+.dhead{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:760px;padding:10px 16px;margin-top:6px;}
+.dworld{font-size:17px;font-weight:800;color:#FFD93B;text-shadow:0 0 10px currentColor;}
 .back-btn{padding:7px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.25);background:rgba(0,0,0,0.4);color:#fff;font-size:13px;cursor:pointer;}
 .back-btn:hover{border-color:#FFD93B;}
-.dress-stage{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;padding:6px 16px;}
-.char-col{display:flex;flex-direction:column;align-items:center;gap:6px;}
-.char-lbl{font-size:13px;font-weight:700;color:#FFD93B;}
-.doll-frame{background:rgba(255,255,255,0.07);border-radius:18px;padding:5px;border:2px solid rgba(255,255,255,0.12);cursor:pointer;transition:all 0.18s;}
-.doll-frame:hover,.doll-frame.sel{border-color:#FF6FA4;box-shadow:0 0 20px #FF6FA455;}
-.dress-controls{width:100%;max-width:860px;background:rgba(0,0,0,0.6);border-radius:18px;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.1);backdrop-filter:blur(8px);margin:8px 16px;}
-.sel-lbl{font-size:12px;color:#C8A2F0;text-align:center;margin-bottom:8px;}
+.dstage{display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px;}
+.mychar-lbl{font-size:15px;font-weight:800;color:#FFD93B;}
+.dframe{background:rgba(255,255,255,0.07);border-radius:18px;padding:5px;border:2px solid rgba(255,255,255,0.12);}
+.dctrl{width:100%;max-width:760px;background:rgba(0,0,0,0.6);border-radius:18px;padding:12px 14px;border:1.5px solid rgba(255,255,255,0.1);backdrop-filter:blur(8px);margin:6px 16px 16px;}
 .tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
 .tab{padding:6px 12px;border-radius:9px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#aaa;font-size:12px;cursor:pointer;transition:all 0.15s;}
 .tab.on{background:#7C6BF0;border-color:#9B8BFF;color:#fff;}
@@ -52,70 +67,78 @@ body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh
 .sw{width:29px;height:29px;border-radius:50%;border:2px solid rgba(255,255,255,0.18);cursor:pointer;transition:all 0.13s;}
 .sw:hover{transform:scale(1.18);border-color:#fff;}
 .sw.on{border:3px solid #FFD93B;box-shadow:0 0 9px #FFD93B88;transform:scale(1.1);}
-.dress-btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
-.go-btn{flex:2;min-width:160px;padding:13px;border:none;border-radius:13px;background:linear-gradient(90deg,#56D45B,#34C3A6);color:#fff;font-size:16px;font-weight:800;cursor:pointer;letter-spacing:.5px;transition:opacity .15s;}
+.dbtns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.go-btn{flex:2;min-width:160px;padding:14px;border:none;border-radius:13px;background:linear-gradient(90deg,#56D45B,#34C3A6);color:#fff;font-size:16px;font-weight:800;cursor:pointer;transition:opacity .15s;}
 .go-btn:hover{opacity:.85;}
-.surp-btn{flex:1;min-width:120px;padding:13px;border:none;border-radius:13px;background:linear-gradient(90deg,#FF6FA4,#7C6BF0);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.surp-btn{flex:1;min-width:110px;padding:14px;border:none;border-radius:13px;background:linear-gradient(90deg,#FF6FA4,#7C6BF0);color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
 .surp-btn:hover{opacity:.85;}
 
-/* ── ADVENTURE ── */
-#advScreen{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;}
+/* ADVENTURE */
+#advScreen{z-index:100;}
 #gameCanvas{display:block;width:100%;height:100%;}
-.hud{position:fixed;top:10px;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:0 14px;pointer-events:none;z-index:120;}
-.hud-score{background:rgba(0,0,0,0.5);color:#FFD93B;font-size:16px;font-weight:800;padding:6px 14px;border-radius:12px;border:1.5px solid rgba(255,217,59,0.3);}
-.hud-stars{color:#FFD93B;font-size:18px;}
-.hud-btns{display:flex;gap:8px;pointer-events:all;}
-.hud-btn{padding:6px 13px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.5);color:#fff;font-size:13px;cursor:pointer;transition:all .15s;}
-.hud-btn:hover{border-color:#FFD93B;background:rgba(255,217,59,.15);}
+.hud{position:fixed;top:8px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 12px;pointer-events:none;z-index:120;}
+.lboard{background:rgba(0,0,0,0.5);border-radius:12px;padding:8px 12px;border:1.5px solid rgba(255,255,255,0.15);min-width:130px;}
+.lb-title{color:#C8A2F0;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.lb-row{color:#fff;font-size:14px;font-weight:700;display:flex;justify-content:space-between;gap:10px;}
+.lb-row.me{color:#FFD93B;}
+.conn{font-size:11px;margin-top:5px;color:#56D45B;}
+.hud-btns{display:flex;flex-direction:column;gap:6px;pointer-events:all;}
+.hud-btn{padding:6px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.5);color:#fff;font-size:12px;cursor:pointer;}
+.hud-btn:hover{border-color:#FFD93B;}
 
-/* mobile controls */
-.mobile-controls{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 18px;z-index:120;pointer-events:none;}
-.mc-left{display:flex;gap:8px;}
-.mc-btn{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:22px;cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;transition:all .1s;user-select:none;-webkit-tap-highlight-color:transparent;}
-.mc-btn:active{background:rgba(255,217,59,.35);border-color:#FFD93B;transform:scale(.93);}
+.mob{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:0 16px;z-index:120;pointer-events:none;}
+.mleft{display:flex;gap:8px;}
+.mbtn{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.5);color:#fff;font-size:24px;cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;user-select:none;transition:all .1s;}
+.mbtn:active{background:rgba(255,217,59,.35);border-color:#FFD93B;transform:scale(.92);}
+.react-btns{display:flex;gap:8px;}
+.rbtn{width:50px;height:50px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);background:rgba(0,0,0,0.5);font-size:22px;cursor:pointer;pointer-events:all;display:flex;align-items:center;justify-content:center;}
+.rbtn:active{transform:scale(.88);}
 </style>
 </head>
 <body>
 
+<!-- IDENTITY -->
+<div id="idScreen" class="screen on">
+  <div class="big-title">🌟 Alma ja Elsa<br>seikkailee yhdessä! 🌟</div>
+  <div class="subt">Kuka sinä olet?</div>
+  <div class="id-btns">
+    <button class="id-btn alma" onclick="setMe('alma')"><span class="em">⭐</span>Alma</button>
+    <button class="id-btn elsa" onclick="setMe('elsa')"><span class="em">💜</span>Elsa</button>
+    <button class="id-btn kaveri" onclick="setMe('kaveri')"><span class="em">😀</span>Kaveri</button>
+  </div>
+  <div class="subt" style="margin-top:30px;font-size:13px;opacity:.7;">Pelaa omalla puhelimellasi — valitse sama maailma kuin kaverisi niin näette toisenne! 📱📱</div>
+</div>
+
 <!-- TITLE -->
-<div id="titleScreen">
-  <div class="t-title">🌟 Alma ja Elsa<br>seikkailee! 🌟</div>
-  <div class="t-sub">Valitse maailma!</div>
+<div id="titleScreen" class="screen">
+  <div class="who-badge" id="whoBadge"></div>
+  <div class="big-title" style="font-size:clamp(22px,5vw,40px);">Valitse maailma!</div>
+  <div class="subt">Mene samaan maailmaan kuin kaverisi 🌍</div>
   <div class="world-grid">
     <button class="wbtn space" onclick="chooseWorld('space')"><span>🚀</span>Avaruus</button>
     <button class="wbtn ocean" onclick="chooseWorld('ocean')"><span>🌊</span>Merenpohja</button>
     <button class="wbtn jungle" onclick="chooseWorld('jungle')"><span>🌴</span>Viidakko</button>
     <button class="wbtn ice" onclick="chooseWorld('ice')"><span>❄️</span>Jäämaailma</button>
     <button class="wbtn fairy" onclick="chooseWorld('fairy')"><span>🧚</span>Satumaailma</button>
-    <button class="wbtn mushroom" onclick="chooseWorld('mushroom')"><span>🍄</span>Sienimaailma</button>
+    <button class="wbtn mushroom" onclick="chooseWorld('mushroom')"><span>🍄</span>Sieni</button>
     <button class="wbtn future" onclick="chooseWorld('future')"><span>🤖</span>Tulevaisuus</button>
     <button class="wbtn circus" onclick="chooseWorld('circus')"><span>🎪</span>Sirkus</button>
   </div>
+  <button class="id-change" onclick="showId()">← Vaihda kuka olet</button>
 </div>
 
-<!-- DRESS UP -->
-<div id="dressScreen">
-  <div class="dress-bg" id="dressBg"></div>
-  <div class="dress-header">
-    <div class="dress-world-name" id="dressWorldName"></div>
-    <button class="back-btn" onclick="showTitle()">← Takaisin</button>
+<!-- DRESS -->
+<div id="dressScreen" class="screen">
+  <div class="dbg" id="dbg"></div>
+  <div class="dhead">
+    <div class="dworld" id="dworld"></div>
+    <button class="back-btn" onclick="showTitle()">← Maailmat</button>
   </div>
-  <div class="dress-stage">
-    <div class="char-col">
-      <div class="char-lbl">⭐ Alma</div>
-      <div class="doll-frame sel" id="frameA" onclick="selChar('A')">
-        <svg id="dollA" viewBox="0 0 280 360" width="150"></svg>
-      </div>
-    </div>
-    <div class="char-col">
-      <div class="char-lbl">💜 Elsa</div>
-      <div class="doll-frame" id="frameB" onclick="selChar('B')">
-        <svg id="dollB" viewBox="0 0 280 360" width="150"></svg>
-      </div>
-    </div>
+  <div class="dstage">
+    <div class="mychar-lbl" id="mycharLbl"></div>
+    <div class="dframe"><svg id="myDoll" viewBox="0 0 280 360" width="170"></svg></div>
   </div>
-  <div class="dress-controls">
-    <div class="sel-lbl" id="selLbl">Muokkaat ⭐ Almaa — klikkaa hahmoa vaihtaaksesi</div>
+  <div class="dctrl">
     <div class="tabs">
       <button class="tab on" onclick="setTab('hahmo')">Hahmo</button>
       <button class="tab" onclick="setTab('hiukset')">Hiukset</button>
@@ -145,7 +168,7 @@ body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh
       <div class="rlbl">Hiusten väri</div><div class="opts" id="b_hairc2"></div>
       <div class="rlbl">Ihonväri</div><div class="opts" id="b_skin2"></div>
     </div>
-    <div class="dress-btns">
+    <div class="dbtns">
       <button class="surp-btn" onclick="surprise()">🎲 Yllätä!</button>
       <button class="go-btn" onclick="startAdventure()">🌍 Seikkaile! →</button>
     </div>
@@ -153,93 +176,97 @@ body{background:#0a0015;font-family:'Segoe UI',Arial,sans-serif;min-height:100vh
 </div>
 
 <!-- ADVENTURE -->
-<div id="advScreen">
+<div id="advScreen" class="screen">
   <canvas id="gameCanvas"></canvas>
   <div class="hud">
-    <div class="hud-score">⭐ <span id="scoreEl">0</span></div>
+    <div class="lboard">
+      <div class="lb-title">⭐ Pisteet</div>
+      <div id="lbRows"></div>
+      <div class="conn" id="connStatus">Yhdistetään…</div>
+    </div>
     <div class="hud-btns">
       <button class="hud-btn" onclick="showDress()">👗 Pukuhuone</button>
       <button class="hud-btn" onclick="showTitle()">🌍 Maailmat</button>
     </div>
   </div>
-  <div class="mobile-controls">
-    <div class="mc-left">
-      <button class="mc-btn" id="btnLeft" ontouchstart="keys.left=true" ontouchend="keys.left=false">◀</button>
-      <button class="mc-btn" id="btnRight" ontouchstart="keys.right=true" ontouchend="keys.right=false">▶</button>
+  <div class="mob">
+    <div class="mleft">
+      <button class="mbtn" ontouchstart="keys.left=true" ontouchend="keys.left=false" onmousedown="keys.left=true" onmouseup="keys.left=false">◀</button>
+      <button class="mbtn" ontouchstart="keys.right=true" ontouchend="keys.right=false" onmousedown="keys.right=true" onmouseup="keys.right=false">▶</button>
     </div>
-    <button class="mc-btn" id="btnJump" ontouchstart="doJump()" ontouchend="">🔼</button>
+    <div class="react-btns">
+      <button class="rbtn" onclick="sendReact('💖')">💖</button>
+      <button class="rbtn" onclick="sendReact('👋')">👋</button>
+      <button class="mbtn" ontouchstart="doJump()" onmousedown="doJump()">🔼</button>
+    </div>
   </div>
 </div>
 
 <script>
-// ══ DATA ══════════════════════════════════════════════════════════════════
+// process shim so @liveblocks/client works in the browser
+window.process = window.process || { env: { NODE_ENV: "production" } };
+
+const LIVEBLOCKS_KEY = "pk_dev_oRQXI5U_-N86a-tnIHkTQ2s07oPpULLI7UaUzk60cJ2ZJs1z3tLxRyrKBXd_Lxxe";
+
+// ══ DATA ══
 const SKIN=['#FFE9D6','#FFE0BD','#F1C27D','#C68642','#8D5524','#B8E994','#C8A2F0','#9BD3FF','#FF9FB2'];
 const HAIRC=['#1a0e08','#9B5A1E','#F0C84B','#E2574C','#7C5CD6','#F07CC4','#F2F2F2','#5BC0EB','#56D45B','#FF8C42'];
 const OUTFC=['#FF6FA4','#7C6BF0','#34C3A6','#FFC93C','#5BA8F5','#FF8C42','#E84393','#56D45B','#FF4D6D','#fff','#FFD93B'];
 const TYPES=['Ihminen','Kissa 🐱','Pupu 🐰','Karhu 🐻','Kettu 🦊','Lohikäärme 🐉','Prinsessa 👸','Supersankari 🦸','Merenneito 🧜','Robotti 🤖','Yksisarvinen 🦄','Keiju 🧚'];
 const EXPRS=['Iloinen','Nauru','Yllättynyt','Tyyni','Siisti 😎'];
 const HAIRS=['Pitkät','Polkka','Letit','Kiharat','Ei hiuksia','Nuttura','Aallot','Piikit'];
-const OUTFITS=['Mekko','T-paita','Tutu','Viitta','Sirkusasu','Tähtimekko','Haalari','Prinsessamekko','Haarniska','Astronauttiasu'];
-const HEADS=['Ei mitään','Kruunu 👑','Jesterihattu','Silinteri','Tähtipanta','Kukka 🌸','Rusetti','Lippis','Noitahattu','Sarvit'];
+const OUTFITS=['Mekko','T-paita','Tutu','Viitta','Sirkusasu','Tähtimekko','Haalari','Prinsessamekko','Haarniska','Astronautti'];
+const HEADS=['Ei mitään','Kruunu 👑','Jesterihattu','Silinteri','Tähtipanta','Kukka 🌸','Rusetti','Lippis','Noitahattu'];
 const EXTRAS=['Ei mitään','Siivet 🪽','Taikasauva','Kaulakoru','Huivi','Lasit','Miekka','Kilpi','Häntä','Tridentti'];
 
 const WORLDS={
-  space:{name:'🚀 Avaruus',sky:['#000015','#0a0035'],ground:'#1a1060',platforms:'#2a2080',collect:'⭐',enemy:'👾',bg:['🌟','⭐','🪐','🌙','☄️'],groundColor:'#1a1060',platColor:'#2a2080',collectColor:'#FFD93B',skyTop:'#000015',skyBot:'#0d0040'},
-  ocean:{name:'🌊 Merenpohja',sky:['#001133','#003366'],ground:'#003355',platforms:'#005588',collect:'🐚',enemy:'🦑',bg:['🐠','🐟','🫧','🌊','🦀'],groundColor:'#004466',platColor:'#006699',collectColor:'#FFD93B',skyTop:'#001133',skyBot:'#003388'},
-  jungle:{name:'🌴 Viidakko',sky:['#021a02','#0a3d0a'],ground:'#0d3d0d',platforms:'#1a5c1a',collect:'🍌',enemy:'🐍',bg:['🌴','🦋','🌺','🌿','🦜'],groundColor:'#0d3d0d',platColor:'#1a6020',collectColor:'#FFD93B',skyTop:'#021a02',skyBot:'#0a4010'},
-  ice:{name:'❄️ Jäämaailma',sky:['#0a1a2b','#1a4466'],ground:'#a0c8e0',platforms:'#7ab0cc',collect:'💎',enemy:'🐧',bg:['❄️','⛄','🌨️','🏔️','🦢'],groundColor:'#8ab8d0',platColor:'#6a98b8',collectColor:'#FFD93B',skyTop:'#0a1a2b',skyBot:'#2255aa'},
-  fairy:{name:'🧚 Satumaailma',sky:['#1a0030','#4a0088'],ground:'#6a20a0',platforms:'#8a3ac0',collect:'🌸',enemy:'🐉',bg:['🧚','🌈','🦄','🌸','💜'],groundColor:'#5a1a90',platColor:'#7a2aaa',collectColor:'#FFD93B',skyTop:'#1a0030',skyBot:'#4a0080'},
-  mushroom:{name:'🍄 Sienimaailma',sky:['#1a0000','#440000'],ground:'#8B0000',platforms:'#cc2200',collect:'🍄',enemy:'🐛',bg:['🍄','🌿','🐞','🦋','💊'],groundColor:'#6B0000',platColor:'#aa2200',collectColor:'#FFD93B',skyTop:'#220000',skyBot:'#550000'},
-  future:{name:'🤖 Tulevaisuus',sky:['#000810','#001525'],ground:'#0a2040',platforms:'#0a3060',collect:'⚡',enemy:'🤖',bg:['💻','⚙️','🔮','📡','⚡'],groundColor:'#0a2040',platColor:'#0a3a60',collectColor:'#FFD93B',skyTop:'#000810',skyBot:'#001a30'},
-  circus:{name:'🎪 Sirkus',sky:['#1a0000','#3a0000'],ground:'#8B1a00',platforms:'#cc3300',collect:'🎈',enemy:'🤹',bg:['🎪','🎭','🎠','🎡','🎯'],groundColor:'#6B1000',platColor:'#aa2200',collectColor:'#FFD93B',skyTop:'#1a0000',skyBot:'#3a0a00'},
+  space:{name:'🚀 Avaruus',collect:'⭐',enemy:'👾',bg:['🌟','⭐','🪐','🌙','☄️'],groundColor:'#1a1060',platColor:'#2a2080',collectColor:'#FFD93B',skyTop:'#000015',skyBot:'#0d0040'},
+  ocean:{name:'🌊 Merenpohja',collect:'🐚',enemy:'🦑',bg:['🐠','🐟','🫧','🌊','🦀'],groundColor:'#004466',platColor:'#006699',collectColor:'#FFD93B',skyTop:'#001133',skyBot:'#003388'},
+  jungle:{name:'🌴 Viidakko',collect:'🍌',enemy:'🐍',bg:['🌴','🦋','🌺','🌿','🦜'],groundColor:'#0d3d0d',platColor:'#1a6020',collectColor:'#FFD93B',skyTop:'#021a02',skyBot:'#0a4010'},
+  ice:{name:'❄️ Jäämaailma',collect:'💎',enemy:'🐧',bg:['❄️','⛄','🌨️','🏔️','🦢'],groundColor:'#8ab8d0',platColor:'#6a98b8',collectColor:'#FFD93B',skyTop:'#0a1a2b',skyBot:'#2255aa'},
+  fairy:{name:'🧚 Satumaailma',collect:'🌸',enemy:'🐉',bg:['🧚','🌈','🦄','🌸','💜'],groundColor:'#5a1a90',platColor:'#7a2aaa',collectColor:'#FFD93B',skyTop:'#1a0030',skyBot:'#4a0080'},
+  mushroom:{name:'🍄 Sienimaailma',collect:'🍄',enemy:'🐛',bg:['🍄','🌿','🐞','🦋','💊'],groundColor:'#6B0000',platColor:'#aa2200',collectColor:'#FFD93B',skyTop:'#220000',skyBot:'#550000'},
+  future:{name:'🤖 Tulevaisuus',collect:'⚡',enemy:'🤖',bg:['💻','⚙️','🔮','📡','⚡'],groundColor:'#0a2040',platColor:'#0a3a60',collectColor:'#FFD93B',skyTop:'#000810',skyBot:'#001a30'},
+  circus:{name:'🎪 Sirkus',collect:'🎈',enemy:'🤹',bg:['🎪','🎭','🎠','🎡','🎯'],groundColor:'#6B1000',platColor:'#aa2200',collectColor:'#FFD93B',skyTop:'#1a0000',skyBot:'#3a0a00'},
 };
 
-// ══ STATE ══════════════════════════════════════════════════════════════════
+const IDENTITIES={
+  alma:{name:'Alma',emoji:'⭐',color:'#FFD93B'},
+  elsa:{name:'Elsa',emoji:'💜',color:'#9B8BFF'},
+  kaveri:{name:'Kaveri',emoji:'😀',color:'#56D45B'},
+};
+
+// ══ STATE ══
+let me={id:'alma',name:'Alma',emoji:'⭐',color:'#FFD93B'};
 let curWorld='space';
-let curChar='A';
-const chars={
-  A:{type:0,expr:0,skin:1,hair:0,hairc:3,outfit:0,outc:0,head:0,extra:0},
-  B:{type:0,expr:0,skin:2,hair:2,hairc:7,outfit:0,outc:1,head:0,extra:0},
+let myChar={type:0,expr:0,skin:1,hair:0,hairc:3,outfit:0,outc:0,head:0,extra:0};
+const DEFAULTS={
+  alma:{type:0,expr:0,skin:1,hair:0,hairc:3,outfit:0,outc:0,head:1,extra:0},
+  elsa:{type:0,expr:0,skin:2,hair:2,hairc:7,outfit:0,outc:1,head:4,extra:1},
+  kaveri:{type:1,expr:0,skin:3,hair:7,hairc:9,outfit:1,outc:2,head:0,extra:0},
 };
 
-// ══ SCREEN MANAGEMENT ═════════════════════════════════════════════════════
-function showTitle(){
-  stopGame();
-  document.getElementById('titleScreen').style.display='flex';
-  document.getElementById('dressScreen').style.display='none';
-  document.getElementById('advScreen').style.display='none';
+// ══ SCREENS ══
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');}
+function showId(){stopGame();leaveRoom();show('idScreen');}
+function setMe(which){
+  me={id:which,...IDENTITIES[which]};
+  myChar={...DEFAULTS[which]};
+  document.getElementById('whoBadge').textContent=`Olet ${me.emoji} ${me.name}`;
+  show('titleScreen');
 }
+function showTitle(){stopGame();leaveRoom();show('titleScreen');}
 function chooseWorld(w){
   curWorld=w;
   const wd=WORLDS[w];
-  document.getElementById('titleScreen').style.display='none';
-  document.getElementById('dressScreen').style.display='flex';
-  document.getElementById('advScreen').style.display='none';
-  document.getElementById('dressBg').style.background=`linear-gradient(180deg,${wd.skyTop},${wd.skyBot})`;
-  document.getElementById('dressWorldName').textContent=wd.name;
-  buildControls();
-  renderDolls();
-  selChar('A');
+  document.getElementById('dbg').style.background=`linear-gradient(180deg,${wd.skyTop},${wd.skyBot})`;
+  document.getElementById('dworld').textContent=wd.name;
+  document.getElementById('mycharLbl').textContent=`${me.emoji} Sinä — ${me.name}`;
+  buildControls();renderMyDoll();show('dressScreen');
 }
-function showDress(){
-  stopGame();
-  document.getElementById('dressScreen').style.display='flex';
-  document.getElementById('advScreen').style.display='none';
-}
-function startAdventure(){
-  document.getElementById('dressScreen').style.display='none';
-  document.getElementById('advScreen').style.display='flex';
-  initGame();
-}
+function showDress(){stopGame();show('dressScreen');}
 
-// ══ DRESS UP ══════════════════════════════════════════════════════════════
-function selChar(c){
-  curChar=c;
-  document.getElementById('frameA').classList.toggle('sel',c==='A');
-  document.getElementById('frameB').classList.toggle('sel',c==='B');
-  document.getElementById('selLbl').textContent=c==='A'?'Muokkaat ⭐ Almaa — klikkaa hahmoa vaihtaaksesi':'Muokkaat 💜 Elsaa — klikkaa hahmoa vaihtaaksesi';
-  refreshBtns();
-}
+// ══ DRESS ══
 function setTab(t){
   const tabs=['hahmo','hiukset','vaatteet','lisaosa','varit'];
   document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('on',tabs[i]===t));
@@ -247,473 +274,213 @@ function setTab(t){
   document.getElementById('p_'+t).classList.add('on');
 }
 function buildControls(){
-  mkBtns('b_type',TYPES,'type',false);mkBtns('b_expr',EXPRS,'expr',false);
-  mkBtns('b_skin',SKIN,'skin',true);mkBtns('b_hair',HAIRS,'hair',false);
-  mkBtns('b_hairc',HAIRC,'hairc',true);mkBtns('b_outfit',OUTFITS,'outfit',false);
-  mkBtns('b_outc',OUTFC,'outc',true);mkBtns('b_outc2',OUTFC,'outc',true);
-  mkBtns('b_hairc2',HAIRC,'hairc',true);mkBtns('b_skin2',SKIN,'skin',true);
-  mkBtns('b_head',HEADS,'head',false);mkBtns('b_extra',EXTRAS,'extra',false);
+  mk('b_type',TYPES,'type',false);mk('b_expr',EXPRS,'expr',false);mk('b_skin',SKIN,'skin',true);
+  mk('b_hair',HAIRS,'hair',false);mk('b_hairc',HAIRC,'hairc',true);mk('b_outfit',OUTFITS,'outfit',false);
+  mk('b_outc',OUTFC,'outc',true);mk('b_outc2',OUTFC,'outc',true);mk('b_hairc2',HAIRC,'hairc',true);
+  mk('b_skin2',SKIN,'skin',true);mk('b_head',HEADS,'head',false);mk('b_extra',EXTRAS,'extra',false);
+  refreshBtns();
 }
-function mkBtns(id,arr,key,colors){
+function mk(id,arr,key,colors){
   const el=document.getElementById(id);if(!el)return;el.innerHTML='';
   arr.forEach((it,i)=>{
     const b=document.createElement('button');
-    if(colors){b.className='sw';b.style.background=it;b.title=it;}
-    else{b.className='opt';b.textContent=it.n||it;}
-    b.dataset.key=key;b.dataset.idx=i;
-    b.onclick=()=>pick(key,i);
+    if(colors){b.className='sw';b.style.background=it;}
+    else{b.className='opt';b.textContent=it;}
+    b.dataset.key=key;b.dataset.idx=i;b.onclick=()=>pick(key,i);
     el.appendChild(b);
   });
 }
-function pick(key,i){chars[curChar][key]=parseInt(i);renderDolls();refreshBtns();}
-function refreshBtns(){
-  const st=chars[curChar];
-  document.querySelectorAll('[data-key]').forEach(b=>{
-    b.classList.toggle('on',st[b.dataset.key]===parseInt(b.dataset.idx));
-  });
-}
+function pick(key,i){myChar[key]=parseInt(i);renderMyDoll();refreshBtns();}
+function refreshBtns(){document.querySelectorAll('[data-key]').forEach(b=>b.classList.toggle('on',myChar[b.dataset.key]===parseInt(b.dataset.idx)));}
 function rnd(a){return Math.floor(Math.random()*a.length);}
 function surprise(){
-  const st=chars[curChar];
-  st.type=rnd(TYPES);st.expr=rnd(EXPRS);st.skin=rnd(SKIN);
-  st.hair=rnd(HAIRS);st.hairc=rnd(HAIRC);st.outfit=rnd(OUTFITS);
-  st.outc=rnd(OUTFC);st.head=rnd(HEADS);st.extra=rnd(EXTRAS);
-  renderDolls();refreshBtns();
+  myChar.type=rnd(TYPES);myChar.expr=rnd(EXPRS);myChar.skin=rnd(SKIN);myChar.hair=rnd(HAIRS);
+  myChar.hairc=rnd(HAIRC);myChar.outfit=rnd(OUTFITS);myChar.outc=rnd(OUTFC);myChar.head=rnd(HEADS);myChar.extra=rnd(EXTRAS);
+  renderMyDoll();refreshBtns();
 }
-function renderDolls(){buildDoll('dollA',chars.A);buildDoll('dollB',chars.B);}
+function renderMyDoll(){buildDollSVG(document.getElementById('myDoll'),myChar);}
 
-// ══ SVG DOLL ══════════════════════════════════════════════════════════════
-function buildDoll(id,st){
-  const svg=document.getElementById(id);if(!svg)return;
-  const s=SKIN[st.skin],h=HAIRC[st.hairc],o=OUTFC[st.outc],e=['#6B4A2E','#2E6B4A','#2E4A6B','#8B2E2E','#4A2E8B','#00ccff','#FF88CC'][st.type%7];
-  let x='';
-  // extra wings behind
-  if(st.extra===1)x+=`<path d="M72 168 Q30 140 18 196 Q48 204 72 184Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2"/><path d="M72 188 Q28 204 22 244 Q54 236 74 212Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2"/><path d="M208 168 Q250 140 262 196 Q232 204 208 184Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2"/><path d="M208 188 Q252 204 258 244 Q226 236 206 212Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2"/>`;
-  // legs+shoes
-  x+=`<rect x="112" y="248" width="18" height="64" rx="9" fill="${s}"/><rect x="150" y="248" width="18" height="64" rx="9" fill="${s}"/><ellipse cx="121" cy="314" rx="18" ry="11" fill="#3a2a4a"/><ellipse cx="159" cy="314" rx="18" ry="11" fill="#3a2a4a"/>`;
-  // arms
-  x+=`<rect x="66" y="172" width="17" height="65" rx="8.5" fill="${s}"/><rect x="197" y="172" width="17" height="65" rx="8.5" fill="${s}"/><circle cx="74" cy="240" r="11" fill="${s}"/><circle cx="205" cy="240" r="11" fill="${s}"/>`;
-  // outfit
-  x+=dollOutfit(st.outfit,o,s);
-  // neck
-  x+=`<rect x="127" y="138" width="22" height="28" rx="10" fill="${s}"/>`;
-  // head
-  x+=`<circle cx="140" cy="110" r="54" fill="${s}"/>`;
-  x+=`<ellipse cx="120" cy="86" rx="18" ry="12" fill="#fff" opacity="0.1"/>`;
-  // hair behind
-  x+=dollHairB(st.hair,h);
-  // face
-  x+=dollFace(st.expr,e,s,h);
-  // hair front
-  x+=dollHairF(st.hair,h);
-  // type extras
-  x+=dollType(st.type,s);
-  // headwear
-  x+=dollHead(st.head,o);
-  // extra front
-  x+=dollExtra(st.extra);
-  svg.innerHTML=x;
-}
-
-function dollOutfit(i,c,s){
-  const a=[
-    `<path d="M88 160 Q140 146 192 160 L212 268 Q140 286 68 268Z" fill="${c}"/><circle cx="140" cy="204" r="7" fill="#fff" opacity="0.6"/><circle cx="140" cy="234" r="7" fill="#fff" opacity="0.6"/>`,
-    `<rect x="88" y="158" width="104" height="68" rx="13" fill="${c}"/><rect x="96" y="224" width="36" height="58" rx="9" fill="#3a4a5a"/><rect x="148" y="224" width="36" height="58" rx="9" fill="#3a4a5a"/>`,
-    `<path d="M88 160 Q140 148 192 160 L202 218 L78 218Z" fill="${c}"/><path d="M62 218 Q140 202 218 218 L232 264 Q140 248 48 264Z" fill="#fff" opacity="0.8"/><path d="M58 256 Q140 240 222 256 L230 286 Q140 272 50 286Z" fill="${c}"/>`,
-    `<path d="M88 160 Q140 146 192 160 L208 274 Q140 292 72 274Z" fill="${c}"/><path d="M192 162 Q248 178 240 270 L218 262 Q222 190 190 175Z" fill="${c}" opacity="0.75"/><path d="M132 168 L148 168 L158 188 L140 202 L122 188Z" fill="#FFD93B"/>`,
-    `<path d="M88 160 Q140 146 192 160 L214 270 Q140 288 66 270Z" fill="${c}"/><circle cx="110" cy="198" r="6" fill="#FFD93B"/><circle cx="140" cy="184" r="6" fill="#fff"/><circle cx="170" cy="198" r="6" fill="#FFD93B"/><path d="M68 265 Q100 250 132 265 Q140 250 148 265 Q180 250 212 265 L212 276 Q140 290 68 276Z" fill="#fff" opacity="0.85"/>`,
-    `<path d="M88 160 Q140 146 192 160 L212 268 Q140 286 68 268Z" fill="${c}"/><path d="M115 202 l4 9 9 1 -7 7 2 9 -8 -4 -8 4 2 -9 -7 -7 9 -1 z" fill="#FFE98A"/><path d="M162 225 l3 7 7 1 -5 5 2 7 -7 -4 -7 4 2 -7 -5 -5 7 -1 z" fill="#FFE98A"/>`,
-    `<rect x="88" y="172" width="104" height="110" rx="11" fill="${c}"/><rect x="96" y="148" width="14" height="40" rx="7" fill="${c}"/><rect x="170" y="148" width="14" height="40" rx="7" fill="${c}"/><rect x="116" y="212" width="48" height="28" rx="5" fill="#fff" opacity="0.45"/>`,
-    `<path d="M88 160 Q140 146 192 160 L220 285 Q140 310 60 285Z" fill="${c}"/><path d="M88 160 Q140 146 192 160 L198 182 Q140 170 82 182Z" fill="#fff" opacity="0.2"/><circle cx="140" cy="210" r="8" fill="#FFD93B"/><circle cx="118" cy="238" r="5" fill="#FFE98A"/><circle cx="162" cy="238" r="5" fill="#FFE98A"/>`,
-    `<path d="M84 158 Q140 142 196 158 L224 278 Q140 302 56 278Z" fill="#7a7a7a"/><path d="M84 158 Q140 142 196 158 L202 178 Q140 164 78 178Z" fill="#aaa"/><rect x="118" y="210" width="44" height="38" rx="6" fill="#5a5a5a"/><circle cx="140" cy="220" r="7" fill="#aaa"/>`,
-    `<path d="M82 156 Q140 138 198 156 L228 282 Q140 308 52 282Z" fill="#ccc"/><path d="M82 156 Q140 138 198 156 L206 178 Q140 165 74 178Z" fill="#fff" opacity="0.4"/><rect x="118" y="212" width="44" height="28" rx="5" fill="#5BA8F5" opacity="0.7"/><circle cx="108" cy="178" r="4" fill="#FFD93B"/><circle cx="172" cy="178" r="4" fill="#FFD93B"/>`,
-  ];
-  return a[i]||a[0];
-}
-
-function dollHairB(i,c){
-  const a=[
-    `<path d="M86 110 Q80 46 140 48 Q200 46 194 110 Q198 162 178 188 L165 172 Q180 118 140 100 Q100 118 115 172 L102 188 Q82 162 86 110Z" fill="${c}"/><path d="M90 70 Q140 46 190 70 Q154 82 140 87 Q126 82 90 70Z" fill="${c}"/>`,
-    `<path d="M88 112 Q82 50 140 48 Q198 50 192 112 Q194 148 183 158 L177 126 Q170 92 140 92 Q110 92 103 126 L97 158 Q86 148 88 112Z" fill="${c}"/>`,
-    `<path d="M92 94 Q98 52 140 52 Q182 52 188 94 Q165 74 140 77 Q115 74 92 94Z" fill="${c}"/><circle cx="86" cy="126" r="22" fill="${c}"/><circle cx="194" cy="126" r="22" fill="${c}"/><circle cx="80" cy="152" r="16" fill="${c}"/><circle cx="200" cy="152" r="16" fill="${c}"/>`,
-    `<circle cx="140" cy="62" r="38" fill="${c}"/><circle cx="108" cy="78" r="30" fill="${c}"/><circle cx="172" cy="78" r="30" fill="${c}"/><circle cx="94" cy="106" r="22" fill="${c}"/><circle cx="186" cy="106" r="22" fill="${c}"/>`,
-    ``,
-    `<path d="M92 94 Q98 54 140 54 Q182 54 188 94 Q165 74 140 77 Q115 74 92 94Z" fill="${c}"/><circle cx="140" cy="51" r="20" fill="${c}"/>`,
-    `<path d="M84 110 Q76 48 140 48 Q204 48 196 110 Q206 175 178 210 Q188 178 175 144 Q185 178 170 208 L158 185 Q174 128 140 106 Q106 128 122 185 L110 208 Q95 178 105 144 Q90 178 100 210 Q74 175 84 110Z" fill="${c}"/>`,
-    `<path d="M106 80 L118 40 L129 74 L140 34 L151 74 L162 40 L174 80 Q140 68 106 80Z" fill="${c}"/><path d="M97 87 Q140 72 183 87 Q180 107 173 116 L167 93 Q140 82 113 93 L107 116 Q100 107 97 87Z" fill="${c}"/>`,
-  ];
-  return a[i]||a[0];
-}
-function dollHairF(i,c){
-  return i===0?`<path d="M108 72 Q132 56 162 60 Q138 70 122 85Z" fill="#fff" opacity="0.15"/>`:i===1?`<path d="M108 74 Q132 58 162 62 Q138 72 124 87Z" fill="#fff" opacity="0.13"/>`:i===5?`<circle cx="134" cy="50" r="7" fill="#fff" opacity="0.18"/>`:i===7?`<path d="M108 80 Q118 56 128 72Z" fill="#fff" opacity="0.14"/>`:i===8?`<circle cx="140" cy="54" r="16" fill="${c}"/>`:'';
-}
-function dollFace(expr,eye,skin,hair){
-  let x='';
-  x+=`<path d="M113 96 Q122 90 131 96" stroke="${hair}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-  x+=`<path d="M149 96 Q158 90 167 96" stroke="${hair}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
-  x+=`<ellipse cx="122" cy="108" rx="9" ry="11" fill="#fff"/><ellipse cx="158" cy="108" rx="9" ry="11" fill="#fff"/>`;
-  x+=`<circle cx="122" cy="109" r="6" fill="${eye}"/><circle cx="158" cy="109" r="6" fill="${eye}"/>`;
-  x+=`<circle cx="122" cy="109" r="2.6" fill="#111"/><circle cx="158" cy="109" r="2.6" fill="#111"/>`;
-  x+=`<circle cx="119" cy="105" r="2" fill="#fff"/><circle cx="155" cy="105" r="2" fill="#fff"/>`;
-  x+=`<line x1="114" y1="99" x2="111" y2="95" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>`;
-  x+=`<line x1="130" y1="99" x2="133" y2="95" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>`;
-  x+=`<line x1="150" y1="99" x2="147" y2="95" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>`;
-  x+=`<line x1="166" y1="99" x2="169" y2="95" stroke="#222" stroke-width="1.5" stroke-linecap="round"/>`;
-  x+=`<ellipse cx="108" cy="124" rx="8" ry="5.5" fill="#FF9BB3" opacity="0.48"/>`;
-  x+=`<ellipse cx="172" cy="124" rx="8" ry="5.5" fill="#FF9BB3" opacity="0.48"/>`;
-  x+=`<ellipse cx="140" cy="128" rx="2.5" ry="3.5" fill="#000" opacity="0.055"/>`;
-  const m=[
-    `<path d="M130 133 Q140 143 150 133" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-    `<path d="M128 131 Q140 149 152 131 Q140 140 128 131Z" fill="#9B3A52"/><path d="M134 140 Q140 145 146 140 Q140 143 134 140Z" fill="#FF7E9D"/>`,
-    `<ellipse cx="140" cy="138" rx="7" ry="9" fill="#9B3A52"/>`,
-    `<path d="M132 136 Q140 141 148 136" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-    `<path d="M130 133 Q140 143 150 133" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="140" cy="118" r="4" fill="#FFD93B"/>`,
-  ];
-  x+=m[expr]||m[0];
-  return x;
-}
-function dollType(i,s){
-  const a=[``,
-    `<path d="M95 70 L104 30 L130 64Z" fill="${s}"/><path d="M185 70 L176 30 L150 64Z" fill="${s}"/><path d="M101 62 L107 40 L123 60Z" fill="#FF9BB3"/><path d="M179 62 L173 40 L157 60Z" fill="#FF9BB3"/><circle cx="140" cy="122" r="3" fill="#E07A9B"/><line x1="108" y1="125" x2="85" y2="120" stroke="#9b8a7a" stroke-width="1.8"/><line x1="108" y1="131" x2="87" y2="134" stroke="#9b8a7a" stroke-width="1.8"/><line x1="172" y1="125" x2="195" y2="120" stroke="#9b8a7a" stroke-width="1.8"/><line x1="172" y1="131" x2="193" y2="134" stroke="#9b8a7a" stroke-width="1.8"/>`,
-    `<ellipse cx="114" cy="36" rx="13" ry="36" fill="${s}" transform="rotate(-10 114 36)"/><ellipse cx="166" cy="36" rx="13" ry="36" fill="${s}" transform="rotate(10 166 36)"/><ellipse cx="114" cy="40" rx="7" ry="24" fill="#FF9BB3" transform="rotate(-10 114 40)"/><ellipse cx="166" cy="40" rx="7" ry="24" fill="#FF9BB3" transform="rotate(10 166 40)"/><circle cx="140" cy="122" r="4" fill="#E07A9B"/>`,
-    `<circle cx="105" cy="67" r="22" fill="${s}"/><circle cx="175" cy="67" r="22" fill="${s}"/><circle cx="105" cy="67" r="12" fill="#C68B6B"/><circle cx="175" cy="67" r="12" fill="#C68B6B"/><circle cx="140" cy="124" r="5" fill="#5A3A2A"/>`,
-    `<path d="M94 74 L102 24 L130 68Z" fill="${s}"/><path d="M186 74 L178 24 L150 68Z" fill="${s}"/><path d="M102 66 L108 38 L124 64Z" fill="#fff"/><path d="M178 66 L172 38 L156 64Z" fill="#fff"/><path d="M140 124 Q135 132 128 134 Q140 126 152 134 Q145 132 140 124Z" fill="#2A1A0A"/>`,
-    `<path d="M100 60 L92 18 L126 56Z" fill="#5f8"/><path d="M180 60 L188 18 L154 56Z" fill="#5f8"/><circle cx="140" cy="124" r="4" fill="#2A6B2A"/>`,
-    `<path d="M122 106 Q136 100 150 106" stroke="#FFD93B" stroke-width="2" fill="none" opacity="0.6"/>`,
-    `<path d="M110 118 Q120 112 130 118" stroke="#FFD93B" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M150 118 Q160 112 170 118" stroke="#FFD93B" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
-    `<circle cx="140" cy="122" r="4" fill="#34C3A6"/><line x1="108" y1="126" x2="82" y2="121" stroke="#34C3A6" stroke-width="1.5" opacity="0.6"/><line x1="172" y1="126" x2="198" y2="121" stroke="#34C3A6" stroke-width="1.5" opacity="0.6"/>`,
-    `<rect x="104" y="99" width="20" height="14" rx="4" fill="#5BA8F5" opacity="0.5"/><rect x="156" y="99" width="20" height="14" rx="4" fill="#5BA8F5" opacity="0.5"/>`,
-    `<path d="M136 54 L144 54 L140 28Z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
-    `<circle cx="96" cy="82" r="5" fill="#FFD93B" opacity="0.8"/><circle cx="184" cy="82" r="5" fill="#FFD93B" opacity="0.8"/>`,
-  ];
-  return a[i]||'';
-}
-function dollHead(i,c){
-  const a=[``,
-    `<path d="M112 66 L122 82 L140 68 L158 82 L168 66 L171 84 Q140 92 109 84Z" fill="#FFD93B" stroke="#E8B400" stroke-width="2"/><circle cx="140" cy="70" r="5" fill="#FF5E8A"/><circle cx="122" cy="80" r="3" fill="#5BA8F5"/><circle cx="158" cy="80" r="3" fill="#5BA8F5"/>`,
-    `<path d="M112 64 Q140 36 168 64 Q172 50 140 42 Q108 50 112 64Z" fill="#6FCF97"/><path d="M112 64 L102 42 Q102 32 116 38Z" fill="#FF5E8A"/><path d="M140 42 L140 18 Q130 15 136 34Z" fill="#FFD93B"/><path d="M168 64 L178 42 Q178 32 164 38Z" fill="#5BA8F5"/><circle cx="102" cy="42" r="5" fill="#FFD93B"/><circle cx="140" cy="18" r="5" fill="#FF5E8A"/><circle cx="178" cy="42" r="5" fill="#5BA8F5"/>`,
-    `<rect x="117" y="30" width="46" height="36" rx="4" fill="#2a2a3a"/><rect x="106" y="62" width="68" height="9" rx="4" fill="#2a2a3a"/><rect x="117" y="54" width="46" height="9" fill="#FF5E8A"/>`,
-    `<path d="M95 80 Q140 62 185 80" stroke="#7C6BF0" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M140 45 l5 12 13 1 -9 9 3 13 -12 -7 -12 7 3 -13 -9 -9 13 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
-    `<circle cx="105" cy="70" r="8" fill="#FF5E8A"/><circle cx="96" cy="63" r="7" fill="#FFD93B"/><circle cx="114" cy="63" r="7" fill="#FFD93B"/><circle cx="100" cy="57" r="7" fill="#FFD93B"/><circle cx="110" cy="57" r="7" fill="#FFD93B"/><circle cx="105" cy="70" r="4.5" fill="#FF8C42"/>`,
-    `<path d="M136 62 Q114 50 112 66 Q114 80 136 70Z" fill="#FF5E8A"/><path d="M144 62 Q166 50 168 66 Q166 80 144 70Z" fill="#FF5E8A"/><circle cx="140" cy="67" r="7" fill="#E84393"/>`,
-    `<path d="M88 92 Q140 74 192 92 Q192 102 140 106 Q88 102 88 92Z" fill="${c}"/><circle cx="140" cy="48" r="26" fill="${c}"/><circle cx="140" cy="48" r="9" fill="#FFD93B"/>`,
-    `<path d="M124 82 L140 12 L156 82Z" fill="#1a1a28"/><path d="M106 90 Q140 76 174 90 Q174 99 140 102 Q106 99 106 90Z" fill="#1a1a28"/><path d="M135 58 L140 24 L144 50Z" fill="#7C6BF0" opacity="0.5"/>`,
-    `<path d="M118 56 L122 38 L130 54Z" fill="${c}"/><path d="M162 56 L158 38 L150 54Z" fill="${c}"/>`,
-  ];
-  return a[i]||'';
-}
-function dollExtra(i){
-  const a=[``,``,
-    `<line x1="205" y1="240" x2="228" y2="186" stroke="#A9743C" stroke-width="5" stroke-linecap="round"/><path d="M228 170 l5 12 13 1 -10 9 3 13 -11 -7 -11 7 3 -13 -10 -9 13 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
-    `<path d="M126 155 Q140 170 154 155" stroke="#FFD93B" stroke-width="4" fill="none"/><circle cx="140" cy="168" r="7" fill="#5BA8F5" stroke="#2E7BC4" stroke-width="2"/>`,
-    `<path d="M116 152 Q140 166 164 152 L167 163 Q140 178 113 163Z" fill="#FF5E8A"/><path d="M152 164 L162 200 L148 200 L140 168Z" fill="#FF5E8A"/>`,
-    `<rect x="104" y="100" width="30" height="22" rx="9" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3"/><rect x="146" y="100" width="30" height="22" rx="9" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3"/><line x1="134" y1="108" x2="146" y2="108" stroke="#333" stroke-width="2.5"/>`,
-    `<rect x="196" y="186" width="6" height="68" rx="3" fill="#C0C0C0"/><rect x="187" y="218" width="24" height="6" rx="3" fill="#8B6914"/><circle cx="199" cy="186" r="5" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,
-    `<path d="M72 176 Q72 216 88 238 Q88 214 72 176Z" fill="#C0A060" stroke="#8B6914" stroke-width="1.5"/><path d="M72 176 L92 168 L112 176 L112 216 Q92 234 72 216Z" fill="#8B4513" stroke="#6B3410" stroke-width="1.5"/><circle cx="92" cy="198" r="8" fill="#C0A060"/>`,
-    `<path d="M205 268 Q235 238 230 208 Q226 188 218 202 Q212 218 220 232 Q224 248 205 264Z" fill="#C68642"/>`,
-    `<line x1="222" y1="138" x2="222" y2="248" stroke="#808080" stroke-width="5" stroke-linecap="round"/><line x1="208" y1="138" x2="208" y2="166" stroke="#808080" stroke-width="3.5" stroke-linecap="round"/><line x1="236" y1="138" x2="236" y2="166" stroke="#808080" stroke-width="3.5" stroke-linecap="round"/>`,
-  ];
-  return a[i]||'';
-}
-
-// ══ GAME ENGINE ═══════════════════════════════════════════════════════════
-const canvas=document.getElementById('gameCanvas');
-const ctx=canvas.getContext('2d');
-let W,H,raf,gameRunning=false;
-let score=0;
-let camX=0;
-const keys={left:false,right:false,up:false};
-let players=[];
-let platforms=[];
-let collectibles=[];
-let enemies=[];
-let worldDecorations=[];
-let particles=[];
-
-function resize(){
-  W=canvas.width=window.innerWidth;
-  H=canvas.height=window.innerHeight;
-}
-window.addEventListener('resize',()=>{resize();if(gameRunning)buildLevel();});
-
-window.addEventListener('keydown',e=>{
-  if(e.key==='ArrowLeft'||e.key==='a')keys.left=true;
-  if(e.key==='ArrowRight'||e.key==='d')keys.right=true;
-  if((e.key==='ArrowUp'||e.key==='w'||e.key===' ')&&gameRunning)doJump();
-  e.preventDefault();
-});
-window.addEventListener('keyup',e=>{
-  if(e.key==='ArrowLeft'||e.key==='a')keys.left=false;
-  if(e.key==='ArrowRight'||e.key==='d')keys.right=false;
-});
-
-function doJump(){
-  players.forEach(p=>{if(p.onGround){p.vy=-16;p.onGround=false;}});
-}
-
-function initGame(){
-  resize();
-  score=0;
-  document.getElementById('scoreEl').textContent='0';
-  gameRunning=true;
-  buildLevel();
-  buildPlayerSprites();
-  if(raf)cancelAnimationFrame(raf);
-  loop();
-}
-
-function stopGame(){
-  gameRunning=false;
-  if(raf)cancelAnimationFrame(raf);
-}
-
-function buildPlayerSprites(){
-  // offscreen canvases for characters
-  players=[
-    makePlayer(200,100,chars.A,'A'),
-    makePlayer(280,100,chars.B,'B'),
-  ];
-}
-
-function makePlayer(x,y,st,id){
-  const oc=document.createElement('canvas');
-  oc.width=80;oc.height=120;
-  const s=buildPlayerCanvas(oc,st);
-  return {x,y,vx:0,vy:0,w:50,h:90,onGround:false,canvas:oc,id,st,facing:1,trail:[]};
-}
-
-function buildPlayerCanvas(oc,st){
-  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.setAttribute('viewBox','0 0 280 360');
-  svg.setAttribute('width','80');svg.setAttribute('height','120');
+// ══ DOLL DRAWING ══
+function buildDollSVG(svg,st){if(svg)svg.innerHTML=dollInner(st);}
+function dollInner(st){
   const s=SKIN[st.skin],h=HAIRC[st.hairc],o=OUTFC[st.outc];
   const e=['#6B4A2E','#2E6B4A','#2E4A6B','#8B2E2E','#4A2E8B','#00ccff','#FF88CC'][st.type%7];
   let x='';
+  if(st.extra===1)x+=`<path d="M72 168 Q30 140 18 196 Q48 204 72 184Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2"/><path d="M72 188 Q28 204 22 244 Q54 236 74 212Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2"/><path d="M208 168 Q250 140 262 196 Q232 204 208 184Z" fill="#EAD9FF" stroke="#C9A8FF" stroke-width="2"/><path d="M208 188 Q252 204 258 244 Q226 236 206 212Z" fill="#FBE3F1" stroke="#F0B6D6" stroke-width="2"/>`;
   x+=`<rect x="112" y="248" width="18" height="64" rx="9" fill="${s}"/><rect x="150" y="248" width="18" height="64" rx="9" fill="${s}"/><ellipse cx="121" cy="314" rx="18" ry="11" fill="#3a2a4a"/><ellipse cx="159" cy="314" rx="18" ry="11" fill="#3a2a4a"/>`;
-  x+=`<rect x="66" y="172" width="17" height="65" rx="8.5" fill="${s}"/><rect x="197" y="172" width="17" height="65" rx="8.5" fill="${s}"/>`;
+  x+=`<rect x="66" y="172" width="17" height="65" rx="8.5" fill="${s}"/><rect x="197" y="172" width="17" height="65" rx="8.5" fill="${s}"/><circle cx="74" cy="240" r="11" fill="${s}"/><circle cx="205" cy="240" r="11" fill="${s}"/>`;
   x+=dollOutfit(st.outfit,o,s);
-  x+=`<rect x="127" y="138" width="22" height="28" rx="10" fill="${s}"/>`;
-  x+=`<circle cx="140" cy="110" r="54" fill="${s}"/>`;
-  x+=dollHairB(st.hair,h);
-  x+=dollFace(st.expr,e,s,h);
-  x+=dollHairF(st.hair,h);
-  x+=dollType(st.type,s);
-  x+=dollHead(st.head,o);
-  svg.innerHTML=x;
-  const blob=new Blob([svg.outerHTML],{type:'image/svg+xml'});
-  const url=URL.createObjectURL(blob);
+  x+=`<rect x="127" y="138" width="22" height="28" rx="10" fill="${s}"/><circle cx="140" cy="110" r="54" fill="${s}"/>`;
+  x+=`<ellipse cx="120" cy="86" rx="18" ry="12" fill="#fff" opacity="0.1"/>`;
+  x+=dollHairB(st.hair,h)+dollFace(st.expr,e,s,h)+dollHairF(st.hair,h)+dollType(st.type,s)+dollHead(st.head,o)+dollExtra(st.extra);
+  return x;
+}
+function dollOutfit(i,c,s){const a=[`<path d="M88 160 Q140 146 192 160 L212 268 Q140 286 68 268Z" fill="${c}"/><circle cx="140" cy="204" r="7" fill="#fff" opacity="0.6"/><circle cx="140" cy="234" r="7" fill="#fff" opacity="0.6"/>`,`<rect x="88" y="158" width="104" height="68" rx="13" fill="${c}"/><rect x="96" y="224" width="36" height="58" rx="9" fill="#3a4a5a"/><rect x="148" y="224" width="36" height="58" rx="9" fill="#3a4a5a"/>`,`<path d="M88 160 Q140 148 192 160 L202 218 L78 218Z" fill="${c}"/><path d="M62 218 Q140 202 218 218 L232 264 Q140 248 48 264Z" fill="#fff" opacity="0.8"/><path d="M58 256 Q140 240 222 256 L230 286 Q140 272 50 286Z" fill="${c}"/>`,`<path d="M88 160 Q140 146 192 160 L208 274 Q140 292 72 274Z" fill="${c}"/><path d="M192 162 Q248 178 240 270 L218 262 Q222 190 190 175Z" fill="${c}" opacity="0.75"/><path d="M132 168 L148 168 L158 188 L140 202 L122 188Z" fill="#FFD93B"/>`,`<path d="M88 160 Q140 146 192 160 L214 270 Q140 288 66 270Z" fill="${c}"/><circle cx="110" cy="198" r="6" fill="#FFD93B"/><circle cx="140" cy="184" r="6" fill="#fff"/><circle cx="170" cy="198" r="6" fill="#FFD93B"/><path d="M68 265 Q100 250 132 265 Q140 250 148 265 Q180 250 212 265 L212 276 Q140 290 68 276Z" fill="#fff" opacity="0.85"/>`,`<path d="M88 160 Q140 146 192 160 L212 268 Q140 286 68 268Z" fill="${c}"/><path d="M115 202 l4 9 9 1 -7 7 2 9 -8 -4 -8 4 2 -9 -7 -7 9 -1 z" fill="#FFE98A"/><path d="M162 225 l3 7 7 1 -5 5 2 7 -7 -4 -7 4 2 -7 -5 -5 7 -1 z" fill="#FFE98A"/>`,`<rect x="88" y="172" width="104" height="110" rx="11" fill="${c}"/><rect x="96" y="148" width="14" height="40" rx="7" fill="${c}"/><rect x="170" y="148" width="14" height="40" rx="7" fill="${c}"/><rect x="116" y="212" width="48" height="28" rx="5" fill="#fff" opacity="0.45"/>`,`<path d="M88 160 Q140 146 192 160 L220 285 Q140 310 60 285Z" fill="${c}"/><path d="M88 160 Q140 146 192 160 L198 182 Q140 170 82 182Z" fill="#fff" opacity="0.2"/><circle cx="140" cy="210" r="8" fill="#FFD93B"/><circle cx="118" cy="238" r="5" fill="#FFE98A"/><circle cx="162" cy="238" r="5" fill="#FFE98A"/>`,`<path d="M84 158 Q140 142 196 158 L224 278 Q140 302 56 278Z" fill="#7a7a7a"/><path d="M84 158 Q140 142 196 158 L202 178 Q140 164 78 178Z" fill="#aaa"/><rect x="118" y="210" width="44" height="38" rx="6" fill="#5a5a5a"/><circle cx="140" cy="220" r="7" fill="#aaa"/>`,`<path d="M82 156 Q140 138 198 156 L228 282 Q140 308 52 282Z" fill="#ccc"/><path d="M82 156 Q140 138 198 156 L206 178 Q140 165 74 178Z" fill="#fff" opacity="0.4"/><rect x="118" y="212" width="44" height="28" rx="5" fill="#5BA8F5" opacity="0.7"/><circle cx="108" cy="178" r="4" fill="#FFD93B"/><circle cx="172" cy="178" r="4" fill="#FFD93B"/>`];return a[i]||a[0];}
+function dollHairB(i,c){const a=[`<path d="M86 110 Q80 46 140 48 Q200 46 194 110 Q198 162 178 188 L165 172 Q180 118 140 100 Q100 118 115 172 L102 188 Q82 162 86 110Z" fill="${c}"/><path d="M90 70 Q140 46 190 70 Q154 82 140 87 Q126 82 90 70Z" fill="${c}"/>`,`<path d="M88 112 Q82 50 140 48 Q198 50 192 112 Q194 148 183 158 L177 126 Q170 92 140 92 Q110 92 103 126 L97 158 Q86 148 88 112Z" fill="${c}"/>`,`<path d="M92 94 Q98 52 140 52 Q182 52 188 94 Q165 74 140 77 Q115 74 92 94Z" fill="${c}"/><circle cx="86" cy="126" r="22" fill="${c}"/><circle cx="194" cy="126" r="22" fill="${c}"/><circle cx="80" cy="152" r="16" fill="${c}"/><circle cx="200" cy="152" r="16" fill="${c}"/>`,`<circle cx="140" cy="62" r="38" fill="${c}"/><circle cx="108" cy="78" r="30" fill="${c}"/><circle cx="172" cy="78" r="30" fill="${c}"/><circle cx="94" cy="106" r="22" fill="${c}"/><circle cx="186" cy="106" r="22" fill="${c}"/>`,``,`<path d="M92 94 Q98 54 140 54 Q182 54 188 94 Q165 74 140 77 Q115 74 92 94Z" fill="${c}"/><circle cx="140" cy="51" r="20" fill="${c}"/>`,`<path d="M84 110 Q76 48 140 48 Q204 48 196 110 Q206 175 178 210 Q188 178 175 144 Q185 178 170 208 L158 185 Q174 128 140 106 Q106 128 122 185 L110 208 Q95 178 105 144 Q90 178 100 210 Q74 175 84 110Z" fill="${c}"/>`,`<path d="M106 80 L118 40 L129 74 L140 34 L151 74 L162 40 L174 80 Q140 68 106 80Z" fill="${c}"/><path d="M97 87 Q140 72 183 87 Q180 107 173 116 L167 93 Q140 82 113 93 L107 116 Q100 107 97 87Z" fill="${c}"/>`];return a[i]||a[0];}
+function dollHairF(i,c){return i===0?`<path d="M108 72 Q132 56 162 60 Q138 70 122 85Z" fill="#fff" opacity="0.15"/>`:i===1?`<path d="M108 74 Q132 58 162 62 Q138 72 124 87Z" fill="#fff" opacity="0.13"/>`:i===5?`<circle cx="134" cy="50" r="7" fill="#fff" opacity="0.18"/>`:'';}
+function dollFace(expr,eye,skin,hair){let x='';x+=`<path d="M113 96 Q122 90 131 96" stroke="${hair}" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M149 96 Q158 90 167 96" stroke="${hair}" stroke-width="4" fill="none" stroke-linecap="round"/>`;x+=`<ellipse cx="122" cy="108" rx="9" ry="11" fill="#fff"/><ellipse cx="158" cy="108" rx="9" ry="11" fill="#fff"/>`;x+=`<circle cx="122" cy="109" r="6" fill="${eye}"/><circle cx="158" cy="109" r="6" fill="${eye}"/>`;x+=`<circle cx="122" cy="109" r="2.6" fill="#111"/><circle cx="158" cy="109" r="2.6" fill="#111"/><circle cx="119" cy="105" r="2" fill="#fff"/><circle cx="155" cy="105" r="2" fill="#fff"/>`;x+=`<ellipse cx="108" cy="124" rx="8" ry="5.5" fill="#FF9BB3" opacity="0.48"/><ellipse cx="172" cy="124" rx="8" ry="5.5" fill="#FF9BB3" opacity="0.48"/>`;const m=[`<path d="M130 133 Q140 143 150 133" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/>`,`<path d="M128 131 Q140 149 152 131 Q140 140 128 131Z" fill="#9B3A52"/><path d="M134 140 Q140 145 146 140 Q140 143 134 140Z" fill="#FF7E9D"/>`,`<ellipse cx="140" cy="138" rx="7" ry="9" fill="#9B3A52"/>`,`<path d="M132 136 Q140 141 148 136" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/>`,`<path d="M130 133 Q140 143 150 133" stroke="#C0506B" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="140" cy="118" r="4" fill="#FFD93B"/>`];x+=m[expr]||m[0];return x;}
+function dollType(i,s){const a=[``,`<path d="M95 70 L104 30 L130 64Z" fill="${s}"/><path d="M185 70 L176 30 L150 64Z" fill="${s}"/><path d="M101 62 L107 40 L123 60Z" fill="#FF9BB3"/><path d="M179 62 L173 40 L157 60Z" fill="#FF9BB3"/><circle cx="140" cy="122" r="3" fill="#E07A9B"/><line x1="108" y1="125" x2="85" y2="120" stroke="#9b8a7a" stroke-width="1.8"/><line x1="172" y1="125" x2="195" y2="120" stroke="#9b8a7a" stroke-width="1.8"/>`,`<ellipse cx="114" cy="36" rx="13" ry="36" fill="${s}" transform="rotate(-10 114 36)"/><ellipse cx="166" cy="36" rx="13" ry="36" fill="${s}" transform="rotate(10 166 36)"/><ellipse cx="114" cy="40" rx="7" ry="24" fill="#FF9BB3" transform="rotate(-10 114 40)"/><ellipse cx="166" cy="40" rx="7" ry="24" fill="#FF9BB3" transform="rotate(10 166 40)"/>`,`<circle cx="105" cy="67" r="22" fill="${s}"/><circle cx="175" cy="67" r="22" fill="${s}"/><circle cx="105" cy="67" r="12" fill="#C68B6B"/><circle cx="175" cy="67" r="12" fill="#C68B6B"/><circle cx="140" cy="124" r="5" fill="#5A3A2A"/>`,`<path d="M94 74 L102 24 L130 68Z" fill="${s}"/><path d="M186 74 L178 24 L150 68Z" fill="${s}"/><path d="M102 66 L108 38 L124 64Z" fill="#fff"/><path d="M178 66 L172 38 L156 64Z" fill="#fff"/>`,`<path d="M100 60 L92 18 L126 56Z" fill="#5f8"/><path d="M180 60 L188 18 L154 56Z" fill="#5f8"/>`,``,``,``,`<rect x="104" y="99" width="20" height="14" rx="4" fill="#5BA8F5" opacity="0.5"/><rect x="156" y="99" width="20" height="14" rx="4" fill="#5BA8F5" opacity="0.5"/>`,`<path d="M136 54 L144 54 L140 28Z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,`<circle cx="96" cy="82" r="5" fill="#FFD93B" opacity="0.8"/><circle cx="184" cy="82" r="5" fill="#FFD93B" opacity="0.8"/>`];return a[i]||'';}
+function dollHead(i,c){const a=[``,`<path d="M112 66 L122 82 L140 68 L158 82 L168 66 L171 84 Q140 92 109 84Z" fill="#FFD93B" stroke="#E8B400" stroke-width="2"/><circle cx="140" cy="70" r="5" fill="#FF5E8A"/>`,`<path d="M112 64 Q140 36 168 64 Q172 50 140 42 Q108 50 112 64Z" fill="#6FCF97"/><path d="M112 64 L102 42 Q102 32 116 38Z" fill="#FF5E8A"/><path d="M140 42 L140 18 Q130 15 136 34Z" fill="#FFD93B"/><path d="M168 64 L178 42 Q178 32 164 38Z" fill="#5BA8F5"/><circle cx="102" cy="42" r="5" fill="#FFD93B"/><circle cx="140" cy="18" r="5" fill="#FF5E8A"/><circle cx="178" cy="42" r="5" fill="#5BA8F5"/>`,`<rect x="117" y="30" width="46" height="36" rx="4" fill="#2a2a3a"/><rect x="106" y="62" width="68" height="9" rx="4" fill="#2a2a3a"/><rect x="117" y="54" width="46" height="9" fill="#FF5E8A"/>`,`<path d="M95 80 Q140 62 185 80" stroke="#7C6BF0" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M140 45 l5 12 13 1 -9 9 3 13 -12 -7 -12 7 3 -13 -9 -9 13 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,`<circle cx="105" cy="70" r="8" fill="#FF5E8A"/><circle cx="96" cy="63" r="7" fill="#FFD93B"/><circle cx="114" cy="63" r="7" fill="#FFD93B"/><circle cx="100" cy="57" r="7" fill="#FFD93B"/><circle cx="110" cy="57" r="7" fill="#FFD93B"/><circle cx="105" cy="70" r="4.5" fill="#FF8C42"/>`,`<path d="M136 62 Q114 50 112 66 Q114 80 136 70Z" fill="#FF5E8A"/><path d="M144 62 Q166 50 168 66 Q166 80 144 70Z" fill="#FF5E8A"/><circle cx="140" cy="67" r="7" fill="#E84393"/>`,`<path d="M88 92 Q140 74 192 92 Q192 102 140 106 Q88 102 88 92Z" fill="${c}"/><circle cx="140" cy="48" r="26" fill="${c}"/><circle cx="140" cy="48" r="9" fill="#FFD93B"/>`,`<path d="M124 82 L140 12 L156 82Z" fill="#1a1a28"/><path d="M106 90 Q140 76 174 90 Q174 99 140 102 Q106 99 106 90Z" fill="#1a1a28"/>`];return a[i]||'';}
+function dollExtra(i){const a=[``,``,`<line x1="205" y1="240" x2="228" y2="186" stroke="#A9743C" stroke-width="5" stroke-linecap="round"/><path d="M228 170 l5 12 13 1 -10 9 3 13 -11 -7 -11 7 3 -13 -10 -9 13 -1 z" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,`<path d="M126 155 Q140 170 154 155" stroke="#FFD93B" stroke-width="4" fill="none"/><circle cx="140" cy="168" r="7" fill="#5BA8F5" stroke="#2E7BC4" stroke-width="2"/>`,`<path d="M116 152 Q140 166 164 152 L167 163 Q140 178 113 163Z" fill="#FF5E8A"/><path d="M152 164 L162 200 L148 200 L140 168Z" fill="#FF5E8A"/>`,`<rect x="104" y="100" width="30" height="22" rx="9" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3"/><rect x="146" y="100" width="30" height="22" rx="9" fill="#bfe0ff" opacity="0.4" stroke="#333" stroke-width="3"/><line x1="134" y1="108" x2="146" y2="108" stroke="#333" stroke-width="2.5"/>`,`<rect x="196" y="186" width="6" height="68" rx="3" fill="#C0C0C0"/><rect x="187" y="218" width="24" height="6" rx="3" fill="#8B6914"/><circle cx="199" cy="186" r="5" fill="#FFD93B" stroke="#E8B400" stroke-width="1.5"/>`,`<path d="M72 176 Q72 216 88 238 Q88 214 72 176Z" fill="#C0A060" stroke="#8B6914" stroke-width="1.5"/><path d="M72 176 L92 168 L112 176 L112 216 Q92 234 72 216Z" fill="#8B4513" stroke="#6B3410" stroke-width="1.5"/><circle cx="92" cy="198" r="8" fill="#C0A060"/>`,`<path d="M205 268 Q235 238 230 208 Q226 188 218 202 Q212 218 220 232 Q224 248 205 264Z" fill="#C68642"/>`,`<line x1="222" y1="138" x2="222" y2="248" stroke="#808080" stroke-width="5" stroke-linecap="round"/><line x1="208" y1="138" x2="208" y2="166" stroke="#808080" stroke-width="3.5" stroke-linecap="round"/><line x1="236" y1="138" x2="236" y2="166" stroke="#808080" stroke-width="3.5" stroke-linecap="round"/>`];return a[i]||'';}
+
+// ══ SPRITE CANVAS (svg -> canvas) ══
+function dollToCanvas(oc,st){
+  const s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" width="80" height="120">${dollInner(st)}</svg>`;
+  const url=URL.createObjectURL(new Blob([s],{type:'image/svg+xml'}));
   const img=new Image();
-  img.onload=()=>{const c2=oc.getContext('2d');c2.clearRect(0,0,80,120);c2.drawImage(img,0,0,80,120);URL.revokeObjectURL(url);};
+  img.onload=()=>{const c=oc.getContext('2d');c.clearRect(0,0,80,120);c.drawImage(img,0,0,80,120);URL.revokeObjectURL(url);};
   img.src=url;
-  return oc;
 }
 
-const LEVEL_WIDTH=6000;
+// ══ SEEDED RNG (same level on every device) ══
+function makeRng(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=h<<13|h>>>19;}return()=>{h=Math.imul(h^h>>>16,2246822507);h=Math.imul(h^h>>>13,3266489909);h^=h>>>16;return(h>>>0)/4294967296;};}
+
+// ══ GAME ══
+const canvas=document.getElementById('gameCanvas'),ctx=canvas.getContext('2d');
+let W,H,raf,gameRunning=false,score=0,camX=0;
+const keys={left:false,right:false};
+let player=null;
+let platforms=[],collectibles=[],enemies=[],decos=[];
+let particles=[],floatEmojis=[];
+const LEVEL_W=6000,GH=60;
+
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;}
+window.addEventListener('resize',()=>{resize();if(gameRunning)buildLevel();});
+window.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=true;if(e.key==='ArrowRight'||e.key==='d')keys.right=true;if((e.key==='ArrowUp'||e.key==='w'||e.key===' ')&&gameRunning)doJump();});
+window.addEventListener('keyup',e=>{if(e.key==='ArrowLeft'||e.key==='a')keys.left=false;if(e.key==='ArrowRight'||e.key==='d')keys.right=false;});
+function doJump(){if(player&&player.onGround){player.vy=-16;player.onGround=false;}}
+
+function startAdventure(){show('advScreen');initGame();connectRoom();}
+function initGame(){
+  resize();score=0;gameRunning=true;
+  buildLevel();
+  const oc=document.createElement('canvas');oc.width=80;oc.height=120;dollToCanvas(oc,myChar);
+  player={x:200,y:100,vx:0,vy:0,w:50,h:90,onGround:false,canvas:oc,facing:1,trail:[]};
+  if(raf)cancelAnimationFrame(raf);loop();
+}
+function stopGame(){gameRunning=false;if(raf)cancelAnimationFrame(raf);}
+
 function buildLevel(){
-  const wd=WORLDS[curWorld];
-  platforms=[];collectibles=[];enemies=[];worldDecorations=[];camX=0;
-  const gh=60;// ground height
-  // ground
-  platforms.push({x:0,y:H-gh,w:LEVEL_WIDTH,h:gh,color:wd.groundColor,isGround:true});
-  // platforms
-  const pColors=[wd.platColor];
+  const wd=WORLDS[curWorld],R=makeRng('seikkailu-'+curWorld);
+  platforms=[{x:0,y:H-GH,w:LEVEL_W,h:GH,color:wd.groundColor,isGround:true}];
+  collectibles=[];enemies=[];decos=[];camX=0;
   let px=400;
-  while(px<LEVEL_WIDTH-200){
-    const pw=80+Math.random()*160;
-    const py=H-gh-100-Math.random()*280;
-    platforms.push({x:px,y:py,w:pw,h:20,color:pColors[0],isGround:false});
-    // collectible on platform
-    if(Math.random()>0.3){
-      collectibles.push({x:px+pw/2-14,y:py-40,w:28,h:28,emoji:wd.collect,collected:false,bob:Math.random()*Math.PI*2});
-    }
-    px+=pw+60+Math.random()*180;
+  while(px<LEVEL_W-200){
+    const pw=80+R()*160,py=H-GH-100-R()*280;
+    platforms.push({x:px,y:py,w:pw,h:20,color:wd.platColor});
+    if(R()>0.3)collectibles.push({x:px+pw/2-14,y:py-40,w:28,h:28,emoji:wd.collect,got:false,bob:R()*6.28});
+    px+=pw+60+R()*180;
   }
-  // some collectibles on ground level
-  for(let i=0;i<20;i++){
-    collectibles.push({x:200+i*280+Math.random()*100,y:H-gh-44,w:28,h:28,emoji:wd.collect,collected:false,bob:Math.random()*Math.PI*2});
-  }
-  // enemies — simple patrol
-  for(let i=0;i<18;i++){
-    enemies.push({x:300+i*320+Math.random()*100,y:H-gh-46,w:36,h:36,emoji:wd.enemy,dir:1,speed:1.2+Math.random()*1.2,startX:300+i*320,patrol:140+Math.random()*120});
-  }
-  // bg decorations
-  wd.bg.forEach((em,i)=>{
-    for(let j=0;j<20;j++){
-      worldDecorations.push({emoji:em,x:100+Math.random()*(LEVEL_WIDTH-200),y:40+Math.random()*(H*0.6),size:18+Math.random()*30,speed:0.15+Math.random()*0.25,alpha:0.25+Math.random()*0.35});
-    }
-  });
+  for(let i=0;i<20;i++)collectibles.push({x:200+i*280+R()*100,y:H-GH-44,w:28,h:28,emoji:wd.collect,got:false,bob:R()*6.28});
+  for(let i=0;i<18;i++){const sx=300+i*320+R()*100;enemies.push({x:sx,y:H-GH-46,w:36,h:36,emoji:wd.enemy,dir:1,speed:1.2+R()*1.2,startX:sx,patrol:140+R()*120});}
+  wd.bg.forEach(em=>{for(let j=0;j<18;j++)decos.push({emoji:em,x:R()*LEVEL_W,y:40+R()*(H*0.6),size:18+R()*30,speed:0.15+R()*0.25,alpha:0.25+R()*0.3});});
 }
 
-function loop(){
-  if(!gameRunning)return;
-  update();
-  draw();
-  raf=requestAnimationFrame(loop);
-}
-
+function loop(){if(!gameRunning)return;update();draw();raf=requestAnimationFrame(loop);}
 function update(){
-  const wd=WORLDS[curWorld];
-  const spd=4.5;
-  const lead=players[0];// camera follows first player
-
-  players.forEach(p=>{
-    if(keys.left){p.vx=-spd;p.facing=-1;}
-    else if(keys.right){p.vx=spd;p.facing=1;}
-    else{p.vx*=0.78;}
-    p.vy+=0.7;// gravity
-    p.x+=p.vx;p.y+=p.vy;
-    p.onGround=false;
-    // platform collision
-    platforms.forEach(pl=>{
-      if(p.x+p.w>pl.x&&p.x<pl.x+pl.w&&p.y+p.h>pl.y&&p.y+p.h<pl.y+pl.h+p.vy+2&&p.vy>=0){
-        p.y=pl.y-p.h;p.vy=0;p.onGround=true;
-      }
-    });
-    // bounds
-    if(p.x<0)p.x=0;
-    if(p.x>LEVEL_WIDTH-p.w)p.x=LEVEL_WIDTH-p.w;
-    if(p.y>H+100){p.y=100;p.vy=0;}// fell off — respawn
-    // trail
-    p.trail.push({x:p.x+p.w/2,y:p.y+p.h/2,a:0.5});
-    if(p.trail.length>8)p.trail.shift();
-    p.trail.forEach(t=>t.a-=0.06);
-    // collect
-    collectibles.forEach(c=>{
-      if(!c.collected&&p.x<c.x+c.w&&p.x+p.w>c.x&&p.y<c.y+c.h&&p.y+p.h>c.y){
-        c.collected=true;score++;
-        document.getElementById('scoreEl').textContent=score;
-        for(let i=0;i<8;i++)particles.push({x:c.x+14,y:c.y+14,vx:(Math.random()-0.5)*5,vy:-Math.random()*5-2,life:1,color:wd.collectColor});
-      }
-    });
-    // enemy hit
-    enemies.forEach(en=>{
-      if(p.x<en.x+en.w&&p.x+p.w>en.x&&p.y<en.y+en.h&&p.y+p.h>en.y){
-        if(p.vy>1&&p.y+p.h<en.y+en.h*0.5+10){
-          // stomp!
-          en.dead=true;p.vy=-10;score+=3;
-          document.getElementById('scoreEl').textContent=score;
-          for(let i=0;i<12;i++)particles.push({x:en.x+18,y:en.y,vx:(Math.random()-0.5)*6,vy:-Math.random()*6-2,life:1,color:'#FFD93B'});
-        } else {
-          // bounce back
-          p.vx=-p.vx*2;p.vy=-8;
-        }
-      }
-    });
-    enemies=enemies.filter(e=>!e.dead);
-  });
-
-  // camera
-  const target=lead.x-W/2+lead.w/2;
-  camX+=(target-camX)*0.1;
-  camX=Math.max(0,Math.min(LEVEL_WIDTH-W,camX));
-
-  // enemies patrol
-  enemies.forEach(en=>{
-    en.x+=en.dir*en.speed;
-    if(en.x>en.startX+en.patrol||en.x<en.startX)en.dir*=-1;
-  });
-  // collectible bob
-  collectibles.forEach(c=>{c.bob+=0.05;});
-  // particles
-  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life-=0.04;});
-  particles=particles.filter(p=>p.life>0);
+  const wd=WORLDS[curWorld],spd=4.5;
+  if(keys.left){player.vx=-spd;player.facing=-1;}else if(keys.right){player.vx=spd;player.facing=1;}else player.vx*=0.78;
+  player.vy+=0.7;player.x+=player.vx;player.y+=player.vy;player.onGround=false;
+  platforms.forEach(pl=>{if(player.x+player.w>pl.x&&player.x<pl.x+pl.w&&player.y+player.h>pl.y&&player.y+player.h<pl.y+pl.h+player.vy+2&&player.vy>=0){player.y=pl.y-player.h;player.vy=0;player.onGround=true;}});
+  if(player.x<0)player.x=0;if(player.x>LEVEL_W-player.w)player.x=LEVEL_W-player.w;if(player.y>H+100){player.y=100;player.vy=0;}
+  player.trail.push({x:player.x+player.w/2,y:player.y+player.h/2,a:0.5});if(player.trail.length>8)player.trail.shift();player.trail.forEach(t=>t.a-=0.06);
+  collectibles.forEach(c=>{if(!c.got&&player.x<c.x+c.w&&player.x+player.w>c.x&&player.y<c.y+c.h&&player.y+player.h>c.y){c.got=true;score++;for(let i=0;i<8;i++)particles.push({x:c.x+14,y:c.y+14,vx:(Math.random()-0.5)*5,vy:-Math.random()*5-2,life:1,color:wd.collectColor});}});
+  enemies.forEach(en=>{if(player.x<en.x+en.w&&player.x+player.w>en.x&&player.y<en.y+en.h&&player.y+player.h>en.y){if(player.vy>1&&player.y+player.h<en.y+en.h*0.5+10){en.dead=true;player.vy=-10;score+=3;for(let i=0;i<12;i++)particles.push({x:en.x+18,y:en.y,vx:(Math.random()-0.5)*6,vy:-Math.random()*6-2,life:1,color:'#FFD93B'});}else{player.vx=-player.vx*2;player.vy=-8;}}});
+  enemies=enemies.filter(e=>!e.dead);
+  enemies.forEach(en=>{en.x+=en.dir*en.speed;if(en.x>en.startX+en.patrol||en.x<en.startX)en.dir*=-1;});
+  const target=player.x-W/2+player.w/2;camX+=(target-camX)*0.1;camX=Math.max(0,Math.min(LEVEL_W-W,camX));
+  collectibles.forEach(c=>c.bob+=0.05);
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=0.18;p.life-=0.04;});particles=particles.filter(p=>p.life>0);
+  floatEmojis.forEach(f=>{f.y-=1.2;f.life-=0.012;});floatEmojis=floatEmojis.filter(f=>f.life>0);
+  // smooth others
+  for(const k in others){const o=others[k];o.dx+=((o.x||0)-o.dx)*0.2;o.dy+=((o.y||0)-o.dy)*0.2;}
+  // broadcast
+  broadcast();
+  updateLeaderboard();
 }
-
 function draw(){
-  const wd=WORLDS[curWorld];
-  ctx.clearRect(0,0,W,H);
-  // sky gradient
-  const grd=ctx.createLinearGradient(0,0,0,H);
-  grd.addColorStop(0,wd.skyTop);grd.addColorStop(1,wd.skyBot);
-  ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
-
+  const wd=WORLDS[curWorld];ctx.clearRect(0,0,W,H);
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,wd.skyTop);g.addColorStop(1,wd.skyBot);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.save();ctx.translate(-camX,0);
-
-  // bg decorations (parallax)
-  worldDecorations.forEach(d=>{
-    ctx.globalAlpha=d.alpha;
-    ctx.font=`${d.size}px serif`;
-    ctx.fillText(d.emoji,d.x-camX*d.speed+camX,d.y);
-  });
-  ctx.globalAlpha=1;
-
-  // platforms
-  platforms.forEach(p=>{
-    ctx.fillStyle=p.color;
-    if(p.isGround){
-      ctx.fillRect(p.x,p.y,p.w,p.h);
-      // ground detail
-      ctx.fillStyle='rgba(255,255,255,0.07)';
-      ctx.fillRect(p.x,p.y,p.w,6);
-    } else {
-      ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,10);ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,0.12)';
-      ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,6,10);ctx.fill();
-    }
-  });
-
-  // collectibles
-  collectibles.forEach(c=>{
-    if(c.collected)return;
-    ctx.font='26px serif';
-    ctx.fillText(c.emoji,c.x,c.y+Math.sin(c.bob)*5);
-    // glow
-    ctx.shadowColor=WORLDS[curWorld].collectColor;
-    ctx.shadowBlur=14;
-    ctx.font='26px serif';
-    ctx.fillText(c.emoji,c.x,c.y+Math.sin(c.bob)*5);
-    ctx.shadowBlur=0;
-  });
-
-  // enemies
-  enemies.forEach(en=>{
-    ctx.font='32px serif';
-    ctx.save();
-    if(en.dir<0){ctx.translate(en.x+18,en.y+18);ctx.scale(-1,1);ctx.fillText(en.emoji,-18,-18);}
-    else{ctx.fillText(en.emoji,en.x,en.y+28);}
-    ctx.restore();
-  });
-
-  // particles
-  particles.forEach(p=>{
-    ctx.globalAlpha=p.life;
-    ctx.fillStyle=p.color;
-    ctx.beginPath();ctx.arc(p.x,p.y,5*p.life,0,Math.PI*2);ctx.fill();
-  });
-  ctx.globalAlpha=1;
-
-  // players
-  players.forEach(p=>{
-    // trail
-    p.trail.forEach(t=>{
-      if(t.a>0){ctx.globalAlpha=Math.max(0,t.a);ctx.fillStyle='rgba(255,217,59,0.4)';ctx.beginPath();ctx.arc(t.x,t.y,10,0,Math.PI*2);ctx.fill();}
-    });
-    ctx.globalAlpha=1;
-    // character
-    ctx.save();
-    const cx2=p.x+p.w/2;
-    ctx.translate(cx2,p.y);
-    if(p.facing<0){ctx.scale(-1,1);ctx.translate(-p.w,0);}else{ctx.translate(-p.w/2,0);}
-    // shadow
-    ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(p.w/2,p.h+4,p.w*0.4,8,0,0,Math.PI*2);ctx.fill();
-    // draw doll canvas
-    if(p.canvas)ctx.drawImage(p.canvas,0,0,p.w,p.h);
-    ctx.restore();
-    // name label
-    ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.roundRect(p.x-8,p.y-26,p.w+16,20,8);ctx.fill();
-    ctx.fillStyle='#FFD93B';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
-    ctx.fillText(p.id==='A'?'⭐ Alma':'💜 Elsa',p.x+p.w/2,p.y-10);
-    ctx.textAlign='left';
-  });
-
+  decos.forEach(d=>{ctx.globalAlpha=d.alpha;ctx.font=`${d.size}px serif`;ctx.fillText(d.emoji,d.x-camX*d.speed+camX,d.y);});ctx.globalAlpha=1;
+  platforms.forEach(p=>{ctx.fillStyle=p.color;if(p.isGround){ctx.fillRect(p.x,p.y,p.w,p.h);ctx.fillStyle='rgba(255,255,255,0.07)';ctx.fillRect(p.x,p.y,p.w,6);}else{ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,p.h,10);ctx.fill();ctx.fillStyle='rgba(255,255,255,0.12)';ctx.beginPath();ctx.roundRect(p.x,p.y,p.w,6,10);ctx.fill();}});
+  collectibles.forEach(c=>{if(c.got)return;ctx.shadowColor=wd.collectColor;ctx.shadowBlur=12;ctx.font='26px serif';ctx.fillText(c.emoji,c.x,c.y+Math.sin(c.bob)*5);ctx.shadowBlur=0;});
+  enemies.forEach(en=>{ctx.font='32px serif';ctx.save();if(en.dir<0){ctx.translate(en.x+18,en.y+18);ctx.scale(-1,1);ctx.fillText(en.emoji,-18,10);}else ctx.fillText(en.emoji,en.x,en.y+28);ctx.restore();});
+  particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,5*p.life,0,6.28);ctx.fill();});ctx.globalAlpha=1;
+  // OTHER PLAYERS
+  for(const k in others){const o=others[k];if(o.world!==curWorld)continue;drawCharacter(o.dx,o.dy,o.facing||1,o.sprite,o.emoji+' '+o.name,o.color,o.reactEmoji,o.reactT);}
+  // ME
+  drawCharacter(player.x,player.y,player.facing,player.canvas,me.emoji+' '+me.name,me.color,myReactEmoji,myReactT);
+  // floating reaction emojis (mine, local)
+  floatEmojis.forEach(f=>{ctx.globalAlpha=Math.max(0,f.life);ctx.font='30px serif';ctx.fillText(f.e,f.x,f.y);});ctx.globalAlpha=1;
+  ctx.font='40px serif';ctx.fillText('🏁',LEVEL_W-60,H-80);
   ctx.restore();
-
-  // finish flag
-  ctx.font='40px serif';
-  ctx.fillText('🏁',LEVEL_WIDTH-camX-60,H-80);
+}
+function drawCharacter(x,y,facing,sprite,label,color,reactEmoji,reactT){
+  const w=50,h=90;
+  ctx.save();ctx.translate(x+w/2,y);if(facing<0){ctx.scale(-1,1);ctx.translate(-w,0);}else ctx.translate(-w/2,0);
+  ctx.fillStyle='rgba(0,0,0,0.2)';ctx.beginPath();ctx.ellipse(w/2,h+4,w*0.4,8,0,0,6.28);ctx.fill();
+  if(sprite)ctx.drawImage(sprite,0,0,w,h);
+  ctx.restore();
+  ctx.fillStyle='rgba(0,0,0,0.5)';ctx.beginPath();ctx.roundRect(x-6,y-26,w+12,20,8);ctx.fill();
+  ctx.fillStyle=color||'#FFD93B';ctx.font='bold 12px sans-serif';ctx.textAlign='center';ctx.fillText(label,x+w/2,y-11);ctx.textAlign='left';
+  if(reactEmoji&&reactT&&Date.now()-reactT<2000){ctx.font='28px serif';ctx.textAlign='center';ctx.fillText(reactEmoji,x+w/2,y-32-Math.min(20,(Date.now()-reactT)/40));ctx.textAlign='left';}
 }
 
-showTitle();
+// ══ REACTIONS ══
+let myReactEmoji=null,myReactT=0;
+function sendReact(e){myReactEmoji=e;myReactT=Date.now();floatEmojis.push({e,x:player.x+25,y:player.y-30,life:1.4});}
+
+// ══ LIVEBLOCKS MULTIPLAYER ══
+let lbClient=null,lbRoom=null,lbLeave=null,lbUnsub=null;
+let others={}; // connectionId -> {x,y,dx,dy,facing,world,name,emoji,color,appear,score,sprite,spriteKey,reactEmoji,reactT}
+let lastAppearStr='';
+
+async function connectRoom(){
+  setConn('Yhdistetään…','#FFD93B');
+  try{
+    if(!lbClient){
+      const mod=await import("https://esm.sh/@liveblocks/client@2.24.3");
+      lbClient=mod.createClient({publicApiKey:LIVEBLOCKS_KEY,throttle:60});
+    }
+    leaveRoom();
+    const roomId="lapset-seikkailu-2026-"+curWorld;
+    const res=lbClient.enterRoom(roomId,{initialPresence:presencePayload()});
+    lbRoom=res.room;lbLeave=res.leave;
+    lbUnsub=lbRoom.subscribe("others",list=>{
+      const seen={};
+      list.forEach(o=>{
+        const id=o.connectionId,p=o.presence||{};seen[id]=true;
+        if(!others[id])others[id]={dx:p.x||0,dy:p.y||0};
+        const e=others[id];
+        Object.assign(e,{x:p.x,y:p.y,facing:p.facing,world:p.world,name:p.name||'Kaveri',emoji:p.emoji||'😀',color:p.color||'#fff',score:p.score||0,reactEmoji:p.reactEmoji,reactT:p.reactT});
+        const ak=JSON.stringify(p.appear||{});
+        if(e.spriteKey!==ak&&p.appear){e.spriteKey=ak;const oc=document.createElement('canvas');oc.width=80;oc.height=120;dollToCanvas(oc,p.appear);e.sprite=oc;}
+      });
+      for(const id in others)if(!seen[id])delete others[id];
+      setConn('🟢 Yhdistetty • '+list.filter(o=>(o.presence||{}).world===curWorld).length+' kaveria',' #56D45B');
+    });
+    setConn('🟢 Yhdistetty • odotetaan kavereita…','#56D45B');
+  }catch(err){
+    console.warn('Liveblocks ei käytettävissä:',err);
+    setConn('🔌 Yksinpeli (ei yhteyttä)','#FF8C42');
+  }
+}
+function presencePayload(){
+  return {x:player?player.x:0,y:player?player.y:0,facing:player?player.facing:1,world:curWorld,name:me.name,emoji:me.emoji,color:me.color,appear:myChar,score:score,reactEmoji:myReactEmoji,reactT:myReactT};
+}
+function broadcast(){if(lbRoom){try{lbRoom.updatePresence(presencePayload());}catch(e){}}}
+function leaveRoom(){if(lbUnsub){try{lbUnsub();}catch(e){}lbUnsub=null;}if(lbLeave){try{lbLeave();}catch(e){}lbLeave=null;}lbRoom=null;others={};}
+function setConn(t,c){const el=document.getElementById('connStatus');if(el){el.textContent=t;el.style.color=c;}}
+
+function updateLeaderboard(){
+  const rows=[{name:me.name,emoji:me.emoji,score:score,me:true}];
+  for(const k in others)if(others[k].world===curWorld)rows.push({name:others[k].name,emoji:others[k].emoji,score:others[k].score||0});
+  rows.sort((a,b)=>b.score-a.score);
+  document.getElementById('lbRows').innerHTML=rows.map(r=>`<div class="lb-row${r.me?' me':''}"><span>${r.emoji} ${r.name}</span><span>${r.score}</span></div>`).join('');
+}
+
+showId();
 </script>
 </body>
 </html>
