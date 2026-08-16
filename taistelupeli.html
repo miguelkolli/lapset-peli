@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Elsan Taistelupeli</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#10131d;color:white}
+button,input,select{font:inherit}.screen{position:fixed;inset:0;display:none}.screen.on{display:flex}
+#setup{overflow:auto;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 20%,#40305f,#151220 55%,#080a10)}
+.card{width:min(920px,94vw);padding:22px;border-radius:24px;background:#171b27dd;border:1px solid #ffffff22;box-shadow:0 24px 80px #0009}
+h1{margin:0;color:#ffd93b;font-size:clamp(28px,6vw,54px)}.sub{color:#bfc7dc;margin:6px 0 20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.box{padding:14px;border:1px solid #ffffff1b;border-radius:16px;background:#0d1018}
+.box h3{margin:0 0 10px;color:#9fb0d8;font-size:13px;text-transform:uppercase;letter-spacing:.5px}.choices{display:flex;gap:8px;flex-wrap:wrap}.choice{border:1px solid #ffffff25;background:#1d2331;color:#fff;padding:10px 12px;border-radius:12px;font-weight:800}.choice.on{border-color:#ffd93b;box-shadow:0 0 0 2px #ffd93b33}.choice small{display:block;color:#aab3c8;font-weight:500}
+select,input[type=text],input[type=color]{background:#111621;color:#fff;border:1px solid #ffffff2d;border-radius:10px;padding:10px;width:100%}
+.avatarPreview{height:180px;display:flex;align-items:center;justify-content:center;background:linear-gradient(#6ec6ff,#b9e7ff 55%,#7fca68 55%);border-radius:14px}
+.blocky{position:relative;width:82px;height:132px}.head{position:absolute;width:54px;height:48px;left:14px;top:0;border-radius:7px;background:#ffd2ad;border:3px solid #111}.hair{position:absolute;left:11px;top:-3px;width:60px;height:22px;background:#5b3b25;border-radius:10px 10px 4px 4px}.body{position:absolute;left:13px;top:47px;width:56px;height:50px;border-radius:5px;background:#7c6bf0;border:3px solid #111}.arm{position:absolute;top:50px;width:17px;height:57px;background:#ffd2ad;border:3px solid #111}.arm.l{left:-4px}.arm.r{right:-4px}.leg{position:absolute;top:95px;width:24px;height:39px;background:#263a66;border:3px solid #111}.leg.l{left:13px}.leg.r{right:13px}.hat{position:absolute;z-index:4;top:-20px;left:9px;font-size:42px}
+.start{margin-top:16px;width:100%;padding:15px;border:0;border-radius:14px;background:linear-gradient(90deg,#56d45b,#34c3a6);color:#07120b;font-size:20px;font-weight:1000}.home{margin-top:8px;width:100%;padding:10px;border:1px solid #ffffff2a;border-radius:12px;background:#111621;color:#fff}
+#game{background:#101722}.hud{position:fixed;z-index:20;left:12px;right:12px;top:10px;display:flex;justify-content:space-between;pointer-events:none;gap:10px}.hudbox{background:#080b12c9;border:1px solid #ffffff22;border-radius:13px;padding:8px 12px;backdrop-filter:blur(8px)}.hud strong{color:#ffd93b}.health{width:170px;height:12px;background:#441d25;border-radius:99px;overflow:hidden;margin-top:5px}.health i{display:block;height:100%;background:#56d45b;width:100%}.status{font-size:11px;color:#9fe5bd}.score{font-size:12px}.exit{pointer-events:all;border:1px solid #ffffff25;background:#131a28;color:#fff;border-radius:9px;padding:7px 10px}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+.joy{position:fixed;z-index:30;left:20px;bottom:20px;width:125px;height:125px;border-radius:50%;background:#ffffff10;border:2px solid #ffffff25;touch-action:none}.knob{position:absolute;width:56px;height:56px;border-radius:50%;left:33px;top:33px;background:#ffffff3d;border:2px solid #fff5}
+.attack{position:fixed;z-index:30;right:25px;bottom:28px;width:88px;height:88px;border-radius:50%;border:3px solid #ffffff55;background:#d4445d;color:white;font-size:30px;font-weight:900}.attack:active{transform:scale(.94);background:#ff5c77}
+#result{align-items:center;justify-content:center;background:#080a10dd;z-index:100}.resultCard{background:#171b27;border:1px solid #ffffff25;border-radius:22px;padding:28px;text-align:center;width:min(480px,90vw)}.resultCard h2{font-size:38px;margin:0 0 8px;color:#ffd93b}.resultCard button{padding:12px 16px;border:0;border-radius:12px;background:#56d45b;font-weight:900;margin:6px}
+.note{font-size:11px;color:#8f9ab3;margin-top:10px}.danger-free{color:#8de8b1;font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.card{margin:14px 0}.avatarPreview{height:145px}}
+</style>
+</head>
+<body>
+<div id="setup" class="screen on">
+  <div class="card">
+    <h1>⚔️ Elsan Taistelupeli</h1>
+    <div class="sub">Valitse avatar, tiimi ja taistelupaikka. Sitten START!</div>
+    <div class="grid">
+      <div class="box">
+        <h3>1. Avatar</h3>
+        <div class="avatarPreview">
+          <div class="blocky">
+            <div class="hat" id="hatPreview">⭐</div><div class="hair"></div><div class="head" id="headPreview"></div>
+            <div class="arm l" id="armL"></div><div class="arm r" id="armR"></div><div class="body" id="bodyPreview"></div>
+            <div class="leg l"></div><div class="leg r"></div>
+          </div>
+        </div>
+        <div class="choices" style="margin-top:10px">
+          <button class="choice who on" data-who="Alma">⭐ Alma</button>
+          <button class="choice who" data-who="Elsa">💜 Elsa</button>
+          <button class="choice who" data-who="Kaveri">😀 Kaveri</button>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          <label>Ihonväri<input id="skin" type="color" value="#ffd2ad"></label>
+          <label>Paidan väri<input id="shirt" type="color" value="#7c6bf0"></label>
+        </div>
+        <div class="choices" style="margin-top:10px">
+          <button class="choice hatChoice on" data-hat="⭐">⭐</button>
+          <button class="choice hatChoice" data-hat="👑">👑</button>
+          <button class="choice hatChoice" data-hat="🧢">🧢</button>
+          <button class="choice hatChoice" data-hat="😈">😈</button>
+          <button class="choice hatChoice" data-hat="">Ei hattua</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="box">
+          <h3>2. Tiimi</h3>
+          <div class="choices">
+            <button class="choice team on" data-team="blaster">🔫 Blaster-tiimi<small>Ampuu värikuulia kaukaa</small></button>
+            <button class="choice team" data-team="sword">🗡️ Miekka-tiimi<small>Lähitaistelu</small></button>
+          </div>
+          <p class="danger-free">Ei verta eikä graafista väkivaltaa — vastustaja muuttuu tähtipölyksi.</p>
+        </div>
+
+        <div class="box" style="margin-top:14px">
+          <h3>3. Taistelupaikka</h3>
+          <div class="choices">
+            <button class="choice arena on" data-arena="city">🏙️ Palikkakaupunki</button>
+            <button class="choice arena" data-arena="space">🚀 Avaruusasema</button>
+            <button class="choice arena" data-arena="castle">🏰 Linna</button>
+          </div>
+        </div>
+
+        <div class="box" style="margin-top:14px">
+          <h3>4. Moninpeli</h3>
+          <label>Huonekoodi<input id="roomCode" type="text" maxlength="8" value="ELSA"></label>
+          <p class="note">Kaverit kirjoittavat saman huonekoodin ja valitsevat saman taistelupaikan.</p>
+        </div>
+      </div>
+    </div>
+    <button class="start" id="startBtn">▶ START</button>
+    <button class="home" onclick="location.href='index.html'">🏠 Takaisin pelivalikkoon</button>
+  </div>
+</div>
+
+<div id="game" class="screen">
+  <canvas id="cv"></canvas>
+  <div class="hud">
+    <div class="hudbox">
+      <div><strong id="meLabel">Elsa</strong> <span id="weaponLabel"></span></div>
+      <div class="health"><i id="hpBar"></i></div>
+      <div class="status" id="conn">Yhdistetään…</div>
+    </div>
+    <div class="hudbox score" id="teams">🔫 0 &nbsp; 🗡️ 0</div>
+    <button class="exit" onclick="leaveGame()">✕ Lopeta</button>
+  </div>
+  <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
+  <button class="attack" id="attackBtn">⚡</button>
+</div>
+
+<div id="result" class="screen">
+  <div class="resultCard">
+    <h2 id="resultTitle">🏆 Voitto!</h2>
+    <p id="resultText"></p>
+    <button onclick="restartRound()">🔁 Uusi kierros</button>
+    <button onclick="leaveGame()">🏠 Valikko</button>
+  </div>
+</div>
+
+<script>
+window.process=window.process||{env:{NODE_ENV:"production"}};
+const LIVEBLOCKS_KEY="pk_dev_oRQXI5U_-N86a-tnIHkTQ2s07oPpULLI7UaUzk60cJ2ZJs1z3tLxRyrKBXd_Lxxe";
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W=innerWidth,H=innerHeight,DPR=Math.min(2,devicePixelRatio||1);
+let who='Alma',team='blaster',arena='city',hat='⭐',skin='#ffd2ad',shirt='#7c6bf0';
+let player=null,others={},room=null,leaveRoom=null,unsubOthers=null,unsubEvent=null,raf=null,last=0,gameOn=false,selfId=null,shots=[],sparkles=[];
+let moveX=0,moveY=0,keys={};
+const WORLD={w:2200,h:1400};
+const ARENAS={
+ city:{bg:'#8fd3ff',ground:'#88c96d',wall:'#5b657a',accent:'#ffd166',name:'🏙️ Palikkakaupunki',
+   blocks:[{x:340,y:260,w:300,h:170},{x:920,y:160,w:260,h:260},{x:1480,y:280,w:360,h:180},{x:500,y:780,w:260,h:300},{x:1080,y:700,w:420,h:180},{x:1700,y:850,w:220,h:300}]},
+ space:{bg:'#090c2a',ground:'#202b4b',wall:'#5966a8',accent:'#65f3ff',name:'🚀 Avaruusasema',
+   blocks:[{x:280,y:210,w:380,h:120},{x:830,y:240,w:180,h:380},{x:1260,y:190,w:500,h:130},{x:380,y:850,w:220,h:260},{x:850,y:800,w:470,h:140},{x:1560,y:690,w:250,h:380}]},
+ castle:{bg:'#a8cdf1',ground:'#83ae6b',wall:'#77706b',accent:'#e7c66b',name:'🏰 Linna',
+   blocks:[{x:250,y:200,w:300,h:260},{x:800,y:200,w:600,h:150},{x:1650,y:200,w:300,h:260},{x:310,y:840,w:330,h:300},{x:900,y:760,w:400,h:300},{x:1600,y:820,w:320,h:280}]}
+};
+
+function toggleGroup(cls,keySetter){
+  document.querySelectorAll('.'+cls).forEach(b=>b.onclick=()=>{document.querySelectorAll('.'+cls).forEach(x=>x.classList.remove('on'));b.classList.add('on');keySetter(b.dataset)});
+}
+toggleGroup('who',d=>who=d.who);toggleGroup('team',d=>team=d.team);toggleGroup('arena',d=>arena=d.arena);toggleGroup('hatChoice',d=>{hat=d.hat;document.getElementById('hatPreview').textContent=hat});
+document.getElementById('skin').oninput=e=>{skin=e.target.value;['headPreview','armL','armR'].forEach(id=>document.getElementById(id).style.background=skin)};
+document.getElementById('shirt').oninput=e=>{shirt=e.target.value;document.getElementById('bodyPreview').style.background=shirt};
+document.getElementById('skin').dispatchEvent(new Event('input'));document.getElementById('shirt').dispatchEvent(new Event('input'));
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on')}
+function resize(){W=innerWidth;H=innerHeight;DPR=Math.min(2,devicePixelRatio||1);cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',resize);resize();
+
+function spawn(teamName){
+  return teamName==='blaster'?{x:150+Math.random()*160,y:WORLD.h/2+Math.random()*200-100}:{x:WORLD.w-310+Math.random()*160,y:WORLD.h/2+Math.random()*200-100};
+}
+document.getElementById('startBtn').onclick=startGame;
+async function startGame(){
+  const code=document.getElementById('roomCode').value.toUpperCase().replace(/[^A-Z0-9ÅÄÖ]/g,'').slice(0,8)||'ELSA';document.getElementById('roomCode').value=code;
+  skin=document.getElementById('skin').value;shirt=document.getElementById('shirt').value;
+  const s=spawn(team);player={x:s.x,y:s.y,vx:0,vy:0,face:team==='blaster'?1:-1,hp:100,dead:false,kos:0};
+  document.getElementById('meLabel').textContent=(who==='Alma'?'⭐ ':who==='Elsa'?'💜 ':'😀 ')+who;
+  document.getElementById('weaponLabel').textContent=team==='blaster'?'🔫 Blaster':'🗡️ Miekka';
+  document.getElementById('attackBtn').textContent=team==='blaster'?'🔫':'🗡️';
+  updateHp();show('game');gameOn=true;last=performance.now();connectRoom(code);cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+async function connectRoom(code){
+  document.getElementById('conn').textContent='Yhdistetään…';
+  try{
+    const mod=await import("https://esm.sh/@liveblocks/client@2.24.3");
+    const client=mod.createClient({publicApiKey:LIVEBLOCKS_KEY,throttle:60});
+    const res=client.enterRoom('lapset-taistelu-'+code+'-'+arena,{initialPresence:presence()});
+    room=res.room;leaveRoom=res.leave;
+    unsubOthers=room.subscribe('others',list=>{
+      const seen={};list.forEach(o=>{seen[o.connectionId]=1;others[o.connectionId]={...(o.presence||{}),connectionId:o.connectionId}});
+      Object.keys(others).forEach(k=>{if(!seen[k])delete others[k]});updateTeams();
+    });
+    unsubEvent=room.subscribe('event',({event})=>{
+      if(event.type==='ATTACK'&&event.target===selfId&&!player.dead){takeDamage(event.damage,event.fromTeam)}
+      if(event.type==='SHOT')shots.push({...event,life:.55});
+    });
+    room.subscribe('status',s=>{
+      document.getElementById('conn').textContent=s==='connected'?'🟢 Moninpeli yhdistetty':'🟡 '+s;
+      if(s==='connected'){const me=room.getSelf();selfId=me?me.connectionId:selfId}
+    });
+    setTimeout(()=>{const me=room&&room.getSelf();if(me)selfId=me.connectionId},300);
+  }catch(e){console.warn(e);document.getElementById('conn').textContent='🔌 Yksinpeli';room=null}
+}
+function presence(){return {x:player?.x||0,y:player?.y||0,face:player?.face||1,hp:player?.hp||100,dead:player?.dead||false,who,team,arena,hat,skin,shirt,kos:player?.kos||0}}
+function broadcast(){if(room&&player){try{room.updatePresence(presence())}catch(e){}}}
+function updateTeams(){
+  let b=team==='blaster'&&!player.dead?1:0,s=team==='sword'&&!player.dead?1:0;
+  Object.values(others).forEach(o=>{if(o.dead)return;if(o.team==='blaster')b++;if(o.team==='sword')s++});
+  document.getElementById('teams').textContent=`🔫 ${b}   vs   🗡️ ${s}`;
+}
+
+addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true});addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
+const joy=document.getElementById('joy'),knob=document.getElementById('knob');let joyId=null;
+joy.addEventListener('pointerdown',e=>{joyId=e.pointerId;joy.setPointerCapture(e.pointerId);joyMove(e)});
+joy.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyMove(e)});
+joy.addEventListener('pointerup',e=>{if(e.pointerId===joyId){joyId=null;moveX=moveY=0;knob.style.transform='translate(0,0)'}});
+function joyMove(e){
+  const r=joy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,dx=e.clientX-cx,dy=e.clientY-cy,m=Math.hypot(dx,dy)||1,max=38,k=Math.min(1,max/m);
+  moveX=dx/max*k;moveY=dy/max*k;knob.style.transform=`translate(${dx*k}px,${dy*k}px)`;
+}
+document.getElementById('attackBtn').onclick=attack;
+
+function loop(t){
+  if(!gameOn)return;const dt=Math.min(.035,(t-last)/1000||.016);last=t;update(dt);draw(dt);raf=requestAnimationFrame(loop);
+}
+function update(dt){
+  if(!player||player.dead)return;
+  let x=moveX,y=moveY;if(keys['a']||keys['arrowleft'])x=-1;if(keys['d']||keys['arrowright'])x=1;if(keys['w']||keys['arrowup'])y=-1;if(keys['s']||keys['arrowdown'])y=1;
+  const mag=Math.hypot(x,y);if(mag>1){x/=mag;y/=mag}const sp=260;
+  if(Math.abs(x)>.05)player.face=x>0?1:-1;
+  const nx=player.x+x*sp*dt,ny=player.y+y*sp*dt;
+  if(!collides(nx,player.y))player.x=clamp(nx,20,WORLD.w-60);
+  if(!collides(player.x,ny))player.y=clamp(ny,20,WORLD.h-80);
+  shots.forEach(s=>s.life-=dt);shots=shots.filter(s=>s.life>0);sparkles.forEach(s=>{s.life-=dt;s.x+=s.vx*dt;s.y+=s.vy*dt});sparkles=sparkles.filter(s=>s.life>0);
+  broadcast();checkWin();
+}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function collides(x,y){
+  const box={x,y,w:46,h:62};return ARENAS[arena].blocks.some(b=>box.x<b.x+b.w&&box.x+box.w>b.x&&box.y<b.y+b.h&&box.y+box.h>b.y)
+}
+function attack(){
+  if(!player||player.dead)return;
+  const enemies=Object.values(others).filter(o=>!o.dead&&o.team!==team&&o.arena===arena);
+  if(!enemies.length){spark(player.x+25,player.y+20,team==='blaster'?'#65f3ff':'#ffd93b');return}
+  let target=null,best=1e9;
+  enemies.forEach(o=>{
+    const dx=o.x-player.x,dy=o.y-player.y,d=Math.hypot(dx,dy);
+    if(team==='sword'){if(d<105&&d<best){target=o;best=d}}
+    else{const front=dx*player.face>0;if(front&&Math.abs(dy)<130&&d<650&&d<best){target=o;best=d}}
+  });
+  if(team==='blaster'){
+    const tx=target?target.x:player.x+player.face*500,ty=target?target.y:player.y;
+    shots.push({x:player.x+23,y:player.y+24,tx,ty,color:'#65f3ff',life:.55});
+    room?.broadcastEvent({type:'SHOT',x:player.x+23,y:player.y+24,tx,ty,color:'#65f3ff'});
+  }else spark(player.x+player.face*55,player.y+25,'#ffd93b');
+  if(target&&room){room.broadcastEvent({type:'ATTACK',target:target.connectionId,damage:team==='blaster'?20:34,fromTeam:team},{shouldQueueEventIfNotReady:false})}
+}
+function takeDamage(dmg,fromTeam){
+  if(fromTeam===team)return;player.hp=Math.max(0,player.hp-dmg);updateHp();spark(player.x+25,player.y+20,'#ffef8a');
+  if(player.hp<=0){player.dead=true;for(let i=0;i<22;i++)sparkles.push({x:player.x+25,y:player.y+25,vx:(Math.random()-.5)*240,vy:(Math.random()-.5)*240,life:1+Math.random(),color:['#ffd93b','#ff6fa4','#65f3ff'][i%3]});broadcast();setTimeout(checkWin,250)}
+}
+function updateHp(){document.getElementById('hpBar').style.width=(player?.hp||0)+'%';document.getElementById('hpBar').style.background=(player?.hp||0)>45?'#56d45b':(player?.hp||0)>20?'#ffd93b':'#ff5c77'}
+function checkWin(){
+  if(!player)return;const all=[{...presence(),self:true},...Object.values(others)].filter(p=>p.arena===arena);
+  if(all.length<2)return;
+  const hasBlaster=all.some(p=>p.team==='blaster'),hasSword=all.some(p=>p.team==='sword');
+  if(!hasBlaster||!hasSword)return;
+  const aliveBlaster=all.some(p=>p.team==='blaster'&&!p.dead),aliveSword=all.some(p=>p.team==='sword'&&!p.dead);
+  if(aliveBlaster&&aliveSword)return;
+  const winner=aliveBlaster?'blaster':aliveSword?'sword':null;if(!winner)return;
+  gameOn=false;setTimeout(()=>{document.getElementById('resultTitle').textContent=winner===team?'🏆 Teidän tiimi voitti!':'✨ Kierros päättyi';
+  document.getElementById('resultText').textContent=(winner==='blaster'?'🔫 Blaster-tiimi':'🗡️ Miekka-tiimi')+' voitti kierroksen.';show('result')},250);
+}
+function restartRound(){
+  const s=spawn(team);player.x=s.x;player.y=s.y;player.hp=100;player.dead=false;updateHp();show('game');gameOn=true;last=performance.now();broadcast();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+function leaveGame(){
+  gameOn=false;cancelAnimationFrame(raf);if(unsubOthers)try{unsubOthers()}catch(e){};if(unsubEvent)try{unsubEvent()}catch(e){};if(leaveRoom)try{leaveRoom()}catch(e){};
+  room=null;leaveRoom=null;unsubOthers=null;unsubEvent=null;others={};show('setup');
+}
+
+function draw(dt){
+  ctx.clearRect(0,0,W,H);const a=ARENAS[arena],camX=clamp(player.x-W/2,0,Math.max(0,WORLD.w-W)),camY=clamp(player.y-H/2,0,Math.max(0,WORLD.h-H));
+  ctx.fillStyle=a.bg;ctx.fillRect(0,0,W,H);ctx.save();ctx.translate(-camX,-camY);
+  ctx.fillStyle=a.ground;ctx.fillRect(0,0,WORLD.w,WORLD.h);
+  drawGrid(a);a.blocks.forEach(b=>drawBlock(b,a));
+  ctx.strokeStyle='#ffffff33';ctx.lineWidth=8;ctx.strokeRect(4,4,WORLD.w-8,WORLD.h-8);
+  Object.values(others).forEach(o=>{if(o.arena===arena)drawAvatar(o.x,o.y,o,o.dead)});
+  drawAvatar(player.x,player.y,{who,team,hat,skin,shirt,hp:player.hp,face:player.face},player.dead,true);
+  shots.forEach(s=>{const p=1-s.life/.55,x=s.x+(s.tx-s.x)*p,y=s.y+(s.ty-s.y)*p;ctx.fillStyle=s.color||'#65f3ff';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=14;ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});
+  sparkles.forEach(s=>{ctx.globalAlpha=Math.max(0,s.life);ctx.fillStyle=s.color;ctx.fillRect(s.x,s.y,7,7)});ctx.globalAlpha=1;
+  ctx.restore();
+}
+function drawGrid(a){ctx.strokeStyle='#ffffff10';ctx.lineWidth=2;for(let x=0;x<WORLD.w;x+=100){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,WORLD.h);ctx.stroke()}for(let y=0;y<WORLD.h;y+=100){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(WORLD.w,y);ctx.stroke()}}
+function drawBlock(b,a){ctx.fillStyle='#0003';ctx.fillRect(b.x+10,b.y+12,b.w,b.h);ctx.fillStyle=a.wall;ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle=a.accent;ctx.fillRect(b.x,b.y,b.w,12);ctx.fillStyle='#ffffff18';for(let x=b.x+28;x<b.x+b.w-20;x+=70)for(let y=b.y+35;y<b.y+b.h-20;y+=65)ctx.fillRect(x,y,24,22)}
+function drawAvatar(x,y,p,dead,me=false){
+  ctx.save();ctx.translate(x,y);if(dead)ctx.globalAlpha=.3;
+  ctx.fillStyle='#0004';ctx.beginPath();ctx.ellipse(23,66,28,9,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle='#263a66';ctx.fillRect(5,44,17,25);ctx.fillRect(27,44,17,25);
+  ctx.fillStyle=p.shirt||'#7c6bf0';ctx.fillRect(3,18,42,33);
+  ctx.fillStyle=p.skin||'#ffd2ad';ctx.fillRect(7,-17,34,35);ctx.fillRect(-7,21,12,35);ctx.fillRect(43,21,12,35);
+  ctx.fillStyle='#5b3b25';ctx.fillRect(6,-19,36,9);
+  ctx.font='24px serif';ctx.textAlign='center';ctx.fillText(p.hat||'',24,-23);
+  ctx.fillStyle='#111';ctx.fillRect(p.face===-1?13:30,-5,4,4);ctx.fillRect(p.face===-1?23:20,-5,4,4);
+  if(p.team==='blaster'){ctx.fillStyle='#29313f';const gx=p.face===-1?-22:47;ctx.fillRect(gx,27,28,8);ctx.fillStyle='#65f3ff';ctx.fillRect(p.face===-1?gx:gx+23,29,5,4)}
+  else{ctx.strokeStyle='#ddd';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(p.face===-1?0:49,28);ctx.lineTo(p.face===-1?-25:74,2);ctx.stroke()}
+  ctx.globalAlpha=1;ctx.font='bold 12px system-ui';ctx.fillStyle=me?'#ffd93b':'#fff';ctx.fillText((p.who||'Kaveri')+' '+(p.team==='blaster'?'🔫':'🗡️'),24,-36);
+  if(!dead){ctx.fillStyle='#311';ctx.fillRect(0,-31,48,5);ctx.fillStyle='#56d45b';ctx.fillRect(0,-31,48*Math.max(0,(p.hp??100))/100,5)}
+  else{ctx.font='24px serif';ctx.fillText('✨',24,15)}
+  ctx.restore();
+}
+function spark(x,y,color){for(let i=0;i<8;i++)sparkles.push({x,y,vx:(Math.random()-.5)*120,vy:(Math.random()-.5)*120,life:.5+Math.random()*.5,color})}
+</script>
+</body>
+</html>
