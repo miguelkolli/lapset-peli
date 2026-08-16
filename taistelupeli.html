@@ -163,6 +163,7 @@ async function connectRoom(code){
     const res=client.enterRoom('lapset-taistelu-'+code+'-'+arena,{initialPresence:presence()});
     room=res.room;leaveRoom=res.leave;
     unsubOthers=room.subscribe('others',list=>{
+      const me=room.getSelf();if(me)selfId=me.connectionId;
       const seen={};list.forEach(o=>{seen[o.connectionId]=1;others[o.connectionId]={...(o.presence||{}),connectionId:o.connectionId}});
       Object.keys(others).forEach(k=>{if(!seen[k])delete others[k]});updateTeams();
     });
