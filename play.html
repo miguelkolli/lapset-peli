@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>🧠 Kertolasku ennen peliä</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:#0b0614;color:#fff;overflow:hidden}
+#gate{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(circle at 50% 10%,#3c2268,#160b26 55%,#09050f)}
+.card{width:min(520px,94vw);padding:26px;border-radius:28px;background:#1d1030;border:2px solid #ffffff1d;box-shadow:0 24px 80px #000b;text-align:center}
+.brain{font-size:58px}.eyebrow{color:#c8a2f0;font-size:13px;font-weight:900;letter-spacing:.9px;text-transform:uppercase;margin-top:4px}h1{margin:8px 0 4px;color:#ffd93b;font-size:clamp(27px,7vw,42px)}.sub{color:#cbb9dc;margin:0 0 22px;line-height:1.45}
+.question{font-size:clamp(42px,13vw,72px);font-weight:1000;letter-spacing:2px;margin:12px 0 18px;color:#fff;text-shadow:0 0 28px #7c6bf066}
+.answer{width:min(240px,80%);height:72px;border:3px solid #7c6bf0;border-radius:18px;background:#0e0718;color:#fff;text-align:center;font-size:38px;font-weight:1000;outline:none}.answer:focus{border-color:#ffd93b;box-shadow:0 0 0 5px #ffd93b20}
+.check{display:block;width:min(300px,90%);margin:15px auto 0;padding:15px;border:0;border-radius:16px;background:linear-gradient(90deg,#56d45b,#34c3a6);color:#06150c;font-size:20px;font-weight:1000;cursor:pointer}.check:disabled{opacity:.65}.math-message{min-height:26px;margin-top:14px;color:#d4c5e8;font-weight:800}.math-message.wrong{color:#ff9aac}.math-message.correct{color:#7af0ad;font-size:20px}.back{display:inline-block;margin-top:16px;color:#bca8d2;text-decoration:none;font-size:13px}
+#gameFrame{position:fixed;inset:0;width:100%;height:100%;border:0;background:#000;display:none}
+@media(max-width:500px){.card{padding:22px 16px}.brain{font-size:48px}.answer{height:66px;font-size:34px}}
+</style>
+</head>
+<body>
+<div id="gate">
+  <div class="card">
+    <div class="brain">🧠</div>
+    <div class="eyebrow">Isän peliportti</div>
+    <h1>Ennen peliä yksi kertolasku!</h1>
+    <p class="sub">Kun vastaus on oikein, peli aukeaa heti. Väärästä vastauksesta saat yrittää samaa laskua uudestaan.</p>
+    <div class="question" id="mathQuestion">? × ? = ?</div>
+    <input class="answer" id="mathAnswer" type="number" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Kertolaskun vastaus">
+    <button class="check" id="mathCheck">TARKISTA 🎮</button>
+    <div class="math-message" id="mathMessage"></div>
+    <a class="back" href="index.html">← Takaisin pelivalikkoon</a>
+  </div>
+</div>
+<iframe id="gameFrame" title="Peli" allow="fullscreen; autoplay"></iframe>
+<script src="math-gate.js"></script>
+<script>
+const allowedGames = new Set([
+  'piirtopeli.html',
+  'taistelupeli.html',
+  'alma-elsa-seikkailee.html',
+  'pukupeli.html'
+]);
+
+const params = new URLSearchParams(location.search);
+const game = params.get('game');
+
+if (!allowedGames.has(game)) {
+  location.replace('index.html');
+} else {
+  const gate = document.getElementById('gate');
+  const frame = document.getElementById('gameFrame');
+
+  MathGate.start(() => {
+    frame.src = game;
+    frame.style.display = 'block';
+    gate.style.display = 'none';
+  });
+
+  frame.addEventListener('load', () => {
+    try {
+      const path = frame.contentWindow.location.pathname;
+      if (path.endsWith('/index.html') || path === '/' || path.endsWith('/')) {
+        location.href = 'index.html';
+      }
+    } catch (_) {}
+  });
+}
+</script>
+</body>
+</html>
