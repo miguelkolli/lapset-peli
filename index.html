@@ -6,7 +6,7 @@
 <title>Alma & Elsan Pelit</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top,#2a1550,#0a0015 58%);color:#fff;padding:28px}
-.wrap{max-width:1000px;margin:auto}h1{color:#ffd93b;font-size:clamp(34px,7vw,64px);text-align:center;text-shadow:0 0 35px #ff6fa4;margin-top:14px}.sub{text-align:center;color:#c8a2f0;margin:8px 0 30px}
+.wrap{max-width:1000px;margin:auto}h1{color:#ffd93b;font-size:clamp(34px,7vw,64px);text-align:center;text-shadow:0 0 35px #ff6fa4;margin-top:14px}.sub{text-align:center;color:#c8a2f0;margin:8px 0 10px}.math{text-align:center;color:#7af0ad;margin:0 0 26px;font-weight:800;font-size:13px}
 .games{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}.card{position:relative;display:flex;flex-direction:column;min-height:245px;padding:24px;border-radius:24px;text-decoration:none;color:#fff;border:2px solid #ffffff17;background:linear-gradient(145deg,#1a0a2e,#2d1b4e);transition:.18s;overflow:hidden}.card:hover{transform:translateY(-5px) scale(1.01);border-color:#ffd93b;box-shadow:0 18px 50px #0008}.icon{font-size:58px}.title{font-size:22px;font-weight:900;color:#ffd93b;margin:10px 0 6px}.desc{color:#d4c5e8;line-height:1.5;font-size:14px;flex:1}.play{margin-top:16px;align-self:flex-start;padding:10px 18px;border-radius:12px;background:linear-gradient(90deg,#ff6fa4,#7c6bf0);font-weight:900}.badge{position:absolute;right:14px;top:14px;padding:5px 9px;border-radius:999px;background:#1f744a;color:#caffdd;font-size:11px;font-weight:900}.alma{background:linear-gradient(145deg,#3a132a,#4b1748)}.elsa{background:linear-gradient(145deg,#14213d,#25265e)}.old{opacity:.94}
 .foot{text-align:center;color:#8f7aaa;font-size:12px;margin-top:28px}
 </style>
@@ -15,26 +15,27 @@
 <div class="wrap">
 <h1>✨ Alma & Elsan Pelit ✨</h1>
 <p class="sub">Valitse peli — osassa peleistä voitte pelata yhdessä eri laitteilla.</p>
+<p class="math">🧠 Isän sääntö: ennen jokaista pelikertaa yksi kertolasku oikein!</p>
 <div class="games">
-  <a class="card alma" href="piirtopeli.html">
+  <a class="card alma" href="play.html?game=piirtopeli.html">
     <span class="badge">MONINPELI</span><div class="icon">🎨</div>
     <div class="title">Alman Piirtopeli</div>
     <div class="desc">Piirrä isoon paperiin eri kynillä ja väreillä. Käytä layer-tasoja, tarroja, kumia ja lisää omia kuvia. Sama huonekoodi = yhteinen piirustus.</div>
     <div class="play">Piirtämään ▶</div>
   </a>
-  <a class="card elsa" href="taistelupeli.html">
+  <a class="card elsa" href="play.html?game=taistelupeli.html">
     <span class="badge">MONINPELI</span><div class="icon">⚔️</div>
     <div class="title">Elsan Taistelupeli</div>
     <div class="desc">Muokkaa palikka-avatar, valitse Blaster- tai Miekka-tiimi ja taistele Palikkakaupungissa, Avaruusasemalla tai Linnassa.</div>
     <div class="play">START ▶</div>
   </a>
-  <a class="card old" href="alma-elsa-seikkailee.html">
+  <a class="card old" href="play.html?game=alma-elsa-seikkailee.html">
     <span class="badge">MONINPELI</span><div class="icon">🌟</div>
     <div class="title">Alma ja Elsa seikkailee</div>
     <div class="desc">Seikkaile kahdeksassa eri maailmassa, pue hahmo ja kohtaa kaverit samassa maailmassa.</div>
     <div class="play">Pelaa ▶</div>
   </a>
-  <a class="card old" href="pukupeli.html">
+  <a class="card old" href="play.html?game=pukupeli.html">
     <div class="icon">👗</div><div class="title">Pukupeli</div>
     <div class="desc">Pue hahmo juuri sellaiseksi kuin haluat. Vaihda hiuksia, vaatteita, koruja ja muuta.</div>
     <div class="play">Pelaa ▶</div>
