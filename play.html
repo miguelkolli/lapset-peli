@@ -23,36 +23,78 @@
     <div class="eyebrow">Isän peliportti</div>
     <h1>Ennen peliä yksi kertolasku!</h1>
     <p class="sub">Kun vastaus on oikein, peli aukeaa heti. Väärästä vastauksesta saat yrittää samaa laskua uudestaan.</p>
-    <div class="question" id="mathQuestion">? × ? = ?</div>
+    <div class="question" id="mathQuestion" aria-live="polite">Arvotaan…</div>
     <input class="answer" id="mathAnswer" type="number" inputmode="numeric" pattern="[0-9]*" autocomplete="off" aria-label="Kertolaskun vastaus">
     <button class="check" id="mathCheck">TARKISTA 🎮</button>
-    <div class="math-message" id="mathMessage"></div>
+    <div class="math-message" id="mathMessage">Ratkaise oikein, niin peli aukeaa 🎮</div>
     <a class="back" href="index.html">← Takaisin pelivalikkoon</a>
   </div>
 </div>
 <iframe id="gameFrame" title="Peli" allow="fullscreen; autoplay"></iframe>
-<script src="math-gate.js"></script>
 <script>
-const allowedGames = new Set([
-  'piirtopeli.html',
-  'taistelupeli.html',
-  'alma-elsa-seikkailee.html',
-  'pukupeli.html'
-]);
+(() => {
+  const allowedGames = new Set([
+    'piirtopeli.html',
+    'taistelupeli.html',
+    'alma-elsa-seikkailee.html',
+    'pukupeli.html'
+  ]);
 
-const params = new URLSearchParams(location.search);
-const game = params.get('game');
+  const params = new URLSearchParams(location.search);
+  const game = params.get('game');
+  if (!allowedGames.has(game)) {
+    location.replace('index.html');
+    return;
+  }
 
-if (!allowedGames.has(game)) {
-  location.replace('index.html');
-} else {
   const gate = document.getElementById('gate');
   const frame = document.getElementById('gameFrame');
+  const question = document.getElementById('mathQuestion');
+  const input = document.getElementById('mathAnswer');
+  const button = document.getElementById('mathCheck');
+  const message = document.getElementById('mathMessage');
 
-  MathGate.start(() => {
-    frame.src = game;
-    frame.style.display = 'block';
-    gate.style.display = 'none';
+  const randFactor = () => Math.floor(Math.random() * 9) + 2; // 2–10
+  const a = randFactor();
+  const b = randFactor();
+  const answer = a * b;
+  let unlocked = false;
+
+  // Arvotaan ja piirretään tehtävä heti samassa skriptissä.
+  question.textContent = `${a} × ${b} = ?`;
+  input.value = '';
+  requestAnimationFrame(() => input.focus());
+
+  function checkAnswer() {
+    if (unlocked) return;
+    const value = Number.parseInt(input.value, 10);
+
+    if (value === answer) {
+      unlocked = true;
+      message.textContent = 'Oikein! 🎉 Peli alkaa!';
+      message.className = 'math-message correct';
+      input.disabled = true;
+      button.disabled = true;
+      setTimeout(() => {
+        frame.src = game;
+        frame.style.display = 'block';
+        gate.style.display = 'none';
+      }, 350);
+      return;
+    }
+
+    message.textContent = 'Ei ihan 😄 Yritä sama lasku uudestaan!';
+    message.className = 'math-message wrong';
+    input.select();
+    input.focus();
+  }
+
+  button.addEventListener('click', checkAnswer);
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      checkAnswer();
+    }
   });
 
   frame.addEventListener('load', () => {
@@ -63,7 +105,7 @@ if (!allowedGames.has(game)) {
       }
     } catch (_) {}
   });
-}
+})();
 </script>
 </body>
 </html>
